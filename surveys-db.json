@@ -1,0 +1,629 @@
+{
+  "surveys": [
+    {
+      "id": "SRV-2026-001",
+      "borrowerName": "Haji Slamet Raharjo",
+      "nik": "3504121205680001",
+      "phone": "081234567891",
+      "address": "Jl. Raya Campurdarat No. 45, Kecamatan Campurdarat, Tulungagung",
+      "businessType": "Kerajinan Batu Marmer & Granit",
+      "businessAge": 12,
+      "requestedAmount": 75000000,
+      "requestedTenor": 24,
+      "monthlyRevenue": 45000000,
+      "monthlyExpenses": 28000000,
+      "netMonthlyIncome": 17000000,
+      "collateralType": "SHM",
+      "collateralDescription": "SHM Tanah dan Bangunan Rumah No. 402/Campurdarat, luas 250m2",
+      "collateralValue": 150000000,
+      "moNotes": "Debitur memiliki reputasi yang sangat baik di lingkungan pengrajin marmer Campurdarat. Pesanan marmer rutin mengalir ke luar kota. Rumah milik sendiri, agunan SHM atas nama sendiri dan sangat marketable.",
+      "gpsLatitude": -8.1724,
+      "gpsLongitude": 111.8791,
+      "gpsAddress": "Campurdarat, Tulungagung, Jawa Timur",
+      "photoUrl": null,
+      "photoKtp": "https://images.unsplash.com/photo-1554774853-aae0a22c8aa4?w=400",
+      "photoDebitur": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+      "surveyPhotos": {
+        "rumah": [
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+          "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400",
+          "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400",
+          "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400"
+        ],
+        "usaha": [
+          "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400",
+          "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400",
+          "https://images.unsplash.com/photo-1581094288338-2314dddb7eed?w=400",
+          "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400"
+        ],
+        "stok": [
+          "https://images.unsplash.com/photo-1581094288338-2314dddb7eed?w=400",
+          "https://images.unsplash.com/photo-1553413719-8758737371b2?w=400",
+          "https://images.unsplash.com/photo-1493934558415-9d19f0b2b4d2?w=400",
+          "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400"
+        ],
+        "agunan": [
+          "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400",
+          "https://images.unsplash.com/photo-1450133064473-71024230f91b?w=400",
+          "https://images.unsplash.com/photo-1512403754473-278556139b6a?w=400",
+          "https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=400"
+        ]
+      },
+      "photoCoordinates": {
+        "rumah": [
+          {
+            "lat": -8.1724,
+            "lng": 111.8791
+          },
+          {
+            "lat": -8.1725,
+            "lng": 111.8792
+          },
+          {
+            "lat": -8.1723,
+            "lng": 111.879
+          },
+          {
+            "lat": -8.1726,
+            "lng": 111.8793
+          }
+        ],
+        "usaha": [
+          {
+            "lat": -8.1724,
+            "lng": 111.8791
+          },
+          {
+            "lat": -8.1725,
+            "lng": 111.8792
+          },
+          {
+            "lat": -8.1723,
+            "lng": 111.879
+          },
+          {
+            "lat": -8.1726,
+            "lng": 111.8793
+          }
+        ],
+        "stok": [
+          {
+            "lat": -8.1724,
+            "lng": 111.8791
+          },
+          {
+            "lat": -8.1725,
+            "lng": 111.8792
+          },
+          {
+            "lat": -8.1723,
+            "lng": 111.879
+          },
+          {
+            "lat": -8.1726,
+            "lng": 111.8793
+          }
+        ],
+        "agunan": [
+          {
+            "lat": -8.1724,
+            "lng": 111.8791
+          },
+          {
+            "lat": -8.1725,
+            "lng": 111.8792
+          },
+          {
+            "lat": -8.1723,
+            "lng": 111.879
+          },
+          {
+            "lat": -8.1726,
+            "lng": 111.8793
+          }
+        ]
+      },
+      "status": "APPROVED",
+      "createdAt": "2026-06-01T08:30:00Z",
+      "updatedAt": "2026-06-02T14:15:00Z",
+      "surveyorEmail": "mo.kurniawan@banktulungagung.co.id",
+      "officeId": "kp1-kauman",
+      "scheme": "PJI",
+      "scores5c": {
+        "character": 95,
+        "capacity": 90,
+        "capital": 85,
+        "collateral": 95,
+        "condition": 90,
+        "qCharacter": "Hubungan baik dengan pembeli marmer nasional, tidak memiliki catatan SLIK jelek.",
+        "qCapacity": "Arus kas harian sangat tinggi, penutupan angsuran sisa kas sisa Rp17.000.000 bersih.",
+        "qCapital": "60% modal mandiri modal sendiri, tidak tergantung hutang lain.",
+        "qCollateral": "SHM di pusat perkotaan Campurdarat, taksiran nilai s/d Rp150.000.000.",
+        "qCondition": "Minat marmer Tulungagung tinggi pasca pembangunan infrastruktur baru."
+      },
+      "kasubagEmail": "kasubag.kp1@banktulungagung.co.id",
+      "kasubagNotes": "Usaha marmer Haji Slamet terpantau ramai. Omzet stabil. Rekomendasi plafon penuh IDR 75.000.000 dengan tenor tetap 24 bulan.",
+      "kasubagApprovedAmount": 75000000,
+      "kasubagActionAt": "2026-06-02T10:00:00Z",
+      "kabagEmail": "kabag.kredit1@banktulungagung.co.id",
+      "kabagNotes": "Komite kredit menyetujui pengajuan ini. Karakter dan agunan sangat kuat untuk meng-cover risiko kredit mikro.",
+      "kabagApprovedAmount": 75000000,
+      "kabagActionAt": "2026-06-02T14:15:00Z",
+      "ewsScore": 1,
+      "aiAnalysis": {
+        "riskAssessment": "LOW",
+        "scoringModel": 92,
+        "ewsFactors": [
+          "Usaha sudah berjalan lama (>10 tahun) memberikan ketahanan bisnis tinggi",
+          "Debt Service Ratio sangat sehat, angsuran bulanan diperkirakan ter-cover 4x lipat sisa pendapatan bersih",
+          "Agunan SHM bernilai 200% dari nominal kredit yang diajukan",
+          "Faktor risiko: Ketergantungan pada bahan baku batu marmer alam dari luar daerah yang fluktuatif"
+        ],
+        "recommendationLimit": 75000000,
+        "narrativeSummary": "Analisis AI menunjukkan Haji Slamet Raharjo memiliki kelayakan kredit yang sangat tinggi berdasarkan profil usaha kerajinan marmer yang sudah matang di Sentra Campurdarat. Cashflow kuat dengan kapasitas angsuran prima. Agunan SHM memberikan jaminan likuidasi risiko yang sangat aman bagi BPR Bank Tulungagung.",
+        "businessViability": "SEHAT",
+        "repaymentCapacity": "KUAT",
+        "capacityRatio": 25
+      }
+    },
+    {
+      "id": "SRV-2026-002",
+      "borrowerName": "Ibu Sumiati",
+      "nik": "3504095408790003",
+      "phone": "085678901234",
+      "address": "Jl. Demuk Gg. 3, Kecamatan Kauman, Tulungagung",
+      "businessType": "Warung Makan Ayam Lodho Khas Tulungagung",
+      "businessAge": 4,
+      "requestedAmount": 30000000,
+      "requestedTenor": 12,
+      "monthlyRevenue": 28000000,
+      "monthlyExpenses": 21000000,
+      "netMonthlyIncome": 7000000,
+      "collateralType": "BPKB",
+      "collateralDescription": "BPKB Sepeda Motor Honda Vario 150 Tahun 2022 No. Pol AG 4192 RDG",
+      "collateralValue": 14000000,
+      "moNotes": "Membuka warung kuliner Ayam Lodho yang cukup terkenal di sekitar Kauman. Pengunjung ramai terutama saat makan siang. Agunan motor dipergunakan untuk operasional harian.",
+      "gpsLatitude": -8.0642,
+      "gpsLongitude": 111.8711,
+      "gpsAddress": "Kauman, Tulungagung, Jawa Timur",
+      "photoUrl": null,
+      "photoKtp": "https://images.unsplash.com/photo-1554774853-aae0a22c8aa4?w=400",
+      "photoDebitur": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400",
+      "surveyPhotos": {
+        "rumah": [
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400"
+        ],
+        "usaha": [
+          "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400",
+          "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400",
+          "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400",
+          "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400"
+        ],
+        "stok": [
+          "https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=400",
+          "https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=400",
+          "https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=400",
+          "https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=400"
+        ],
+        "agunan": [
+          "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=400",
+          "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=400",
+          "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=400",
+          "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=400"
+        ]
+      },
+      "photoCoordinates": {
+        "rumah": [
+          {
+            "lat": -8.0642,
+            "lng": 111.8711
+          },
+          {
+            "lat": -8.0643,
+            "lng": 111.8712
+          },
+          {
+            "lat": -8.0641,
+            "lng": 111.871
+          },
+          {
+            "lat": -8.0644,
+            "lng": 111.8713
+          }
+        ],
+        "usaha": [
+          {
+            "lat": -8.0642,
+            "lng": 111.8711
+          },
+          {
+            "lat": -8.0643,
+            "lng": 111.8712
+          },
+          {
+            "lat": -8.0641,
+            "lng": 111.871
+          },
+          {
+            "lat": -8.0644,
+            "lng": 111.8713
+          }
+        ],
+        "stok": [
+          {
+            "lat": -8.0642,
+            "lng": 111.8711
+          },
+          {
+            "lat": -8.0643,
+            "lng": 111.8712
+          },
+          {
+            "lat": -8.0641,
+            "lng": 111.871
+          },
+          {
+            "lat": -8.0644,
+            "lng": 111.8713
+          }
+        ],
+        "agunan": [
+          {
+            "lat": -8.0642,
+            "lng": 111.8711
+          },
+          {
+            "lat": -8.0643,
+            "lng": 111.8712
+          },
+          {
+            "lat": -8.0641,
+            "lng": 111.871
+          },
+          {
+            "lat": -8.0644,
+            "lng": 111.8713
+          }
+        ]
+      },
+      "status": "SUBMITTED_MO",
+      "createdAt": "2026-06-03T09:15:00Z",
+      "updatedAt": "2026-06-03T11:45:00Z",
+      "surveyorEmail": "mo.kurniawan@banktulungagung.co.id",
+      "officeId": "kp1-kauman",
+      "scheme": "PJI",
+      "scores5c": {
+        "character": 85,
+        "capacity": 75,
+        "capital": 70,
+        "collateral": 50,
+        "condition": 80,
+        "qCharacter": "Karakter ulet, jujur, warga asli Kauman.",
+        "qCapacity": "Omzet harian bersih warung ayam lodho rata-rata Rp200.000 - Rp300.000 per hari.",
+        "qCapital": "Warung berdiri mandiri, barang-barang milik pribadi.",
+        "qCollateral": "Cover agunan BPKB motor taksiran nilai Rp14.000.000, di bawah pinjaman diajukan.",
+        "qCondition": "Persaingan kuliner ayam lodho tinggi, namun rasa masakan Ibu Sumiati sangat khas dan digemari."
+      },
+      "kasubagEmail": null,
+      "kasubagNotes": null,
+      "kasubagApprovedAmount": null,
+      "kasubagActionAt": null,
+      "kabagEmail": null,
+      "kabagNotes": null,
+      "kabagApprovedAmount": null,
+      "kabagActionAt": null,
+      "ewsScore": 4,
+      "aiAnalysis": {
+        "riskAssessment": "MEDIUM",
+        "scoringModel": 74,
+        "ewsFactors": [
+          "Usaha makanan harian menghasilkan arus kas masuk yang stabil & likuid",
+          "Kapasitas bayar cukup memadai dibanding sisa pendapatan",
+          "Peringatan (EWS): Nilai taksiran agunan BPKB Motor (IDR 14jt) lebih rendah dibanding nominal kredit yang diajukan (IDR 30jt)",
+          "Rekomendasi: Turunkan plafon kredit menyesuaikan nilai cover agunan fisik, atau tambahkan agunan pendamping"
+        ],
+        "recommendationLimit": 20000000,
+        "narrativeSummary": "Ibu Sumiati menjalankan Warung Ayam Lodho yang mapan di Kauman dengan arus keuangan harian sehat. Risiko utama terletak pada rasio penutupan agunan (BPKB Motor) yang berada di bawah plafon pengajuan (IDR 30 juta). Disarankan pemberian limit diperingan ke IDR 20.000.000 untuk keamanan hedging risiko.",
+        "businessViability": "SEHAT",
+        "repaymentCapacity": "SEDANG",
+        "capacityRatio": 45
+      }
+    },
+    {
+      "id": "SRV-2026-003",
+      "borrowerName": "Bapak Agus Setiawan",
+      "nik": "3504041111820002",
+      "phone": "089876543210",
+      "address": "Kecamatan Boyolangu, Tulungagung",
+      "businessType": "Budidaya Ikan Gurame Kolam Terpal",
+      "businessAge": 3,
+      "requestedAmount": 40000000,
+      "requestedTenor": 18,
+      "monthlyRevenue": 35000000,
+      "monthlyExpenses": 29000000,
+      "netMonthlyIncome": 6000000,
+      "collateralType": "SHM",
+      "collateralDescription": "SHM Pekarangan No. 892/Boyolangu, luas 180m2 atas nama orang tua",
+      "collateralValue": 80000000,
+      "moNotes": "Mengusahakan budidaya patin dan gurame sebanyak 6 kolam. Omzet diperoleh per-panen setiap 6-8 bulan sekali, namun debitur memiliki pendapatan warung kelonong kecil di depan rumah untuk harian. Agunan SHM milik orang tua dan ada persetujuan ahli waris.",
+      "gpsLatitude": -8.0987,
+      "gpsLongitude": 111.9022,
+      "gpsAddress": "Boyolangu, Tulungagung, Jawa Timur",
+      "photoUrl": null,
+      "photoKtp": "https://images.unsplash.com/photo-1554774853-aae0a22c8aa4?w=400",
+      "photoDebitur": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+      "surveyPhotos": {
+        "rumah": [
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400"
+        ],
+        "usaha": [
+          "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=400",
+          "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=400",
+          "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=400",
+          "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=400"
+        ],
+        "stok": [
+          "https://images.unsplash.com/photo-1520301255226-bf5f1442e1a5?w=400",
+          "https://images.unsplash.com/photo-1520301255226-bf5f1442e1a5?w=400",
+          "https://images.unsplash.com/photo-1520301255226-bf5f1442e1a5?w=400",
+          "https://images.unsplash.com/photo-1520301255226-bf5f1442e1a5?w=400"
+        ],
+        "agunan": [
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400"
+        ]
+      },
+      "photoCoordinates": {
+        "rumah": [
+          {
+            "lat": -8.0987,
+            "lng": 111.9022
+          },
+          {
+            "lat": -8.0988,
+            "lng": 111.9023
+          },
+          {
+            "lat": -8.0986,
+            "lng": 111.9021
+          },
+          {
+            "lat": -8.0989,
+            "lng": 111.9024
+          }
+        ],
+        "usaha": [
+          {
+            "lat": -8.0987,
+            "lng": 111.9022
+          },
+          {
+            "lat": -8.0988,
+            "lng": 111.9023
+          },
+          {
+            "lat": -8.0986,
+            "lng": 111.9021
+          },
+          {
+            "lat": -8.0989,
+            "lng": 111.9024
+          }
+        ],
+        "stok": [
+          {
+            "lat": -8.0987,
+            "lng": 111.9022
+          },
+          {
+            "lat": -8.0988,
+            "lng": 111.9023
+          },
+          {
+            "lat": -8.0986,
+            "lng": 111.9021
+          },
+          {
+            "lat": -8.0989,
+            "lng": 111.9024
+          }
+        ],
+        "agunan": [
+          {
+            "lat": -8.0987,
+            "lng": 111.9022
+          },
+          {
+            "lat": -8.0988,
+            "lng": 111.9023
+          },
+          {
+            "lat": -8.0986,
+            "lng": 111.9021
+          },
+          {
+            "lat": -8.0989,
+            "lng": 111.9024
+          }
+        ]
+      },
+      "status": "REVIEWED_KASUBAG",
+      "createdAt": "2026-06-03T14:20:00Z",
+      "updatedAt": "2026-06-04T07:10:00Z",
+      "surveyorEmail": "mo.anita@banktulungagung.co.id",
+      "officeId": "cab-bandung",
+      "scheme": "PPP",
+      "scores5c": {
+        "character": 80,
+        "capacity": 65,
+        "capital": 75,
+        "collateral": 80,
+        "condition": 60,
+        "qCharacter": "Anggota aktif kelompok pembudidaya mina lestari Boyolangu.",
+        "qCapacity": "Pendapatan per panen tinggi tapi musiman (per 6-7 bulan), sela-panen didukung toko kelontong harian.",
+        "qCapital": "Kapasitas modal terbagi untuk bibit pakan mandiri.",
+        "qCollateral": "Agunan SHM milik orang tua, surat kuasa siap.",
+        "qCondition": "Fluktuasi pakan pelet tinggi, butuh pakan alternatif mandiri."
+      },
+      "kasubagEmail": "kasubag.campurdarat@banktulungagung.co.id",
+      "kasubagNotes": "Pola pendapatan budidaya perikanan bersifat musiman. Namun didukung warung kelontong aktif harian. Agunan SHM cukup aman. Disetujui rekomendasi limit IDR 35.000.000.",
+      "kasubagApprovedAmount": 35000000,
+      "kasubagActionAt": "2026-06-04T07:10:00Z",
+      "kabagEmail": null,
+      "kabagNotes": null,
+      "kabagApprovedAmount": null,
+      "kabagActionAt": null,
+      "ewsScore": 6,
+      "aiAnalysis": {
+        "riskAssessment": "MEDIUM",
+        "scoringModel": 68,
+        "ewsFactors": [
+          "Agunan SHM bernilai memadai meng-cover pengajuan",
+          "Peringatan (EWS): Sifat pendapatan usaha musiman (per-panen gurame) rentan terhadap hambatan pasang-surut pasar atau penyakit air",
+          "Peringatan (EWS): Agunan SHM terdaftar milik orang tua (buran debitur langsung), membutuhkan surat persetujuan dan verifikasi khusus seluruh ahli waris"
+        ],
+        "recommendationLimit": 35000000,
+        "narrativeSummary": "Penilaian AI merekomendasikan limit moderat IDR 35 juta untuk mengantisipasi risiko siklus panen gurame demi menjaga kelancaran angsuran sela-panen. Keberadaan pendapatan harian dari toko kelontong keluarga menjadi faktor mitigasi krusial.",
+        "businessViability": "CUKUP",
+        "repaymentCapacity": "SEDANG",
+        "capacityRatio": 52
+      }
+    }
+  ],
+  "users": [
+    {
+      "email": "admin@banktulungagung.co.id",
+      "name": "Hendra Admin Utama",
+      "role": "ADMIN",
+      "nik": "3504011202800001",
+      "officeId": "kp1-pusat",
+      "status": "APPROVED",
+      "createdAt": "2026-06-01T00:00:00Z"
+    },
+    {
+      "email": "appslaporan@gmail.com",
+      "name": "Alhuda (Admin)",
+      "role": "ADMIN",
+      "nik": "3504011202800002",
+      "officeId": "kp1-pusat",
+      "status": "APPROVED",
+      "createdAt": "2026-06-01T00:00:00Z"
+    },
+    {
+      "email": "alhuda@banktulungagung.co.id",
+      "name": "Alhuda (Admin Utama)",
+      "role": "ADMIN",
+      "nik": "3504011202800003",
+      "officeId": "kp1-pusat",
+      "status": "APPROVED",
+      "createdAt": "2026-06-01T00:00:00Z"
+    },
+    {
+      "email": "mo.kurniawan@banktulungagung.co.id",
+      "name": "Kurniawan (MO KP1)",
+      "role": "MO",
+      "nik": "3504121508940002",
+      "officeId": "kp1-kauman",
+      "status": "APPROVED",
+      "createdAt": "2026-06-01T02:00:00Z"
+    },
+    {
+      "email": "kasubag.kp1@banktulungagung.co.id",
+      "name": "Budi Santoso (Kasubag KP1)",
+      "role": "KASUBAG",
+      "nik": "3504022405820003",
+      "officeId": "kp1-pusat",
+      "status": "APPROVED",
+      "createdAt": "2026-06-01T02:05:00Z"
+    },
+    {
+      "email": "kabag.kredit1@banktulungagung.co.id",
+      "name": "Sugeng Riyadi (Kabag Kredit 1)",
+      "role": "KABAG",
+      "nik": "3504010311750001",
+      "officeId": "kp1-pusat",
+      "status": "APPROVED",
+      "createdAt": "2026-06-01T02:10:00Z"
+    },
+    {
+      "email": "mo.prakoso@banktulungagung.co.id",
+      "name": "Dwi Prakoso (MO KP2)",
+      "role": "MO",
+      "nik": "3504221109960001",
+      "officeId": "kp2-ngunut",
+      "status": "APPROVED",
+      "createdAt": "2026-06-02T01:00:00Z"
+    },
+    {
+      "email": "kasubag.kp2@banktulungagung.co.id",
+      "name": "Endang Tri (Kepala Kas Ngunut)",
+      "role": "KASUBAG",
+      "nik": "3504201802840004",
+      "officeId": "kp2-pusat",
+      "status": "APPROVED",
+      "createdAt": "2026-06-02T01:10:00Z"
+    },
+    {
+      "email": "kabag.kredit2@banktulungagung.co.id",
+      "name": "Prasetyo (Kabag Kredit 2)",
+      "role": "KABAG",
+      "nik": "3504012010720002",
+      "officeId": "kp2-pusat",
+      "status": "APPROVED",
+      "createdAt": "2026-06-02T01:20:00Z"
+    },
+    {
+      "email": "mo.anita@banktulungagung.co.id",
+      "name": "Anita Rahma (MO Campurdarat)",
+      "role": "MO",
+      "nik": "3504104205930005",
+      "officeId": "cab-bandung",
+      "status": "APPROVED",
+      "createdAt": "2026-06-03T02:00:00Z"
+    },
+    {
+      "email": "kasubag.campurdarat@banktulungagung.co.id",
+      "name": "Wahyudi (Kasubag Campurdarat)",
+      "role": "KASUBAG",
+      "nik": "3504121510850001",
+      "officeId": "cab-campurdarat",
+      "status": "APPROVED",
+      "createdAt": "2026-06-03T02:10:00Z"
+    },
+    {
+      "email": "pimpinan.campurdarat@banktulungagung.co.id",
+      "name": "Bambang Widjojo (Pimcab Campurdarat)",
+      "role": "KABAG",
+      "nik": "3504011212700001",
+      "officeId": "cab-campurdarat",
+      "status": "APPROVED",
+      "createdAt": "2026-06-03T02:20:00Z"
+    },
+    {
+      "email": "mo.lapangan@banktulungagung.co.id",
+      "name": "Rian Hidayat (MO Baru)",
+      "role": "MO",
+      "nik": "3504151205970002",
+      "officeId": "cab-boyolangu",
+      "status": "PENDING",
+      "createdAt": "2026-06-04T01:30:00Z"
+    },
+    {
+      "email": "kasubag.baru@banktulungagung.co.id",
+      "name": "Siti Rahayu (Pendaftar Kasubag)",
+      "role": "KASUBAG",
+      "nik": "3504054412900001",
+      "officeId": "kp1-ngemplak",
+      "status": "PENDING",
+      "createdAt": "2026-06-04T03:45:00Z"
+    }
+  ]
+}

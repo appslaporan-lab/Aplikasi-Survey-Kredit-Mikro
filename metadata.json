@@ -1,0 +1,6 @@
+{
+  "name": "Aplikasi Survey Kredit Mikro",
+  "description": "Aplikasi survey kredit mikro mobile-friendly untuk Marketing Officer, approval bertingkat Kasubag & Kabag, dilengkapi rekomendasi AI dan EWS berbasis Google Gemini API.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
