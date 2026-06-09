@@ -10,6 +10,8 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { CreditSurvey, AIAnalysis, FieldUser, Office, SurveyScheme } from "./src/types.js";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, doc, getDocs, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 
 dotenv.config();
 
@@ -18,7 +20,11 @@ const PORT = 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
-const DB_FILE = path.join(process.cwd(), "surveys-db.json");
+// Initialize Firebase Firestore connection using pre-configured applet credential file
+const CONFIG_FILE = path.join(process.cwd(), "firebase-applet-config.json");
+const firebaseConfig = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf-8"));
+const firebaseApp = initializeApp(firebaseConfig);
+const dbFirestore = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
 
 // System Offices
 const OFFICES: Office[] = [
@@ -51,7 +57,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504011202800001",
     officeId: "kp1-pusat",
     status: "APPROVED",
-    createdAt: "2026-06-01T00:00:00Z"
+    createdAt: "2026-06-01T00:00:00Z",
+    username: "admin",
+    password: "bank123"
   },
   {
     email: "appslaporan@gmail.com",
@@ -60,7 +68,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504011202800002",
     officeId: "kp1-pusat",
     status: "APPROVED",
-    createdAt: "2026-06-01T00:00:00Z"
+    createdAt: "2026-06-01T00:00:00Z",
+    username: "alhuda",
+    password: "bank123"
   },
   {
     email: "alhuda@banktulungagung.co.id",
@@ -69,7 +79,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504011202800003",
     officeId: "kp1-pusat",
     status: "APPROVED",
-    createdAt: "2026-06-01T00:00:00Z"
+    createdAt: "2026-06-01T00:00:00Z",
+    username: "alhuda2",
+    password: "bank123"
   },
   // KP 1
   {
@@ -79,7 +91,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504121508940002",
     officeId: "kp1-kauman",
     status: "APPROVED",
-    createdAt: "2026-06-01T02:00:00Z"
+    createdAt: "2026-06-01T02:00:00Z",
+    username: "mo.kurniawan",
+    password: "bank123"
   },
   {
     email: "kasubag.kp1@banktulungagung.co.id",
@@ -88,7 +102,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504022405820003",
     officeId: "kp1-pusat",
     status: "APPROVED",
-    createdAt: "2026-06-01T02:05:00Z"
+    createdAt: "2026-06-01T02:05:00Z",
+    username: "kasubag.kp1",
+    password: "bank123"
   },
   {
     email: "kabag.kredit1@banktulungagung.co.id",
@@ -97,7 +113,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504010311750001",
     officeId: "kp1-pusat",
     status: "APPROVED",
-    createdAt: "2026-06-01T02:10:00Z"
+    createdAt: "2026-06-01T02:10:00Z",
+    username: "kabag.kredit1",
+    password: "bank123"
   },
   // KP 2
   {
@@ -107,7 +125,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504221109960001",
     officeId: "kp2-ngunut",
     status: "APPROVED",
-    createdAt: "2026-06-02T01:00:00Z"
+    createdAt: "2026-06-02T01:00:00Z",
+    username: "mo.prakoso",
+    password: "bank123"
   },
   {
     email: "kasubag.kp2@banktulungagung.co.id",
@@ -116,7 +136,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504201802840004",
     officeId: "kp2-pusat",
     status: "APPROVED",
-    createdAt: "2026-06-02T01:10:00Z"
+    createdAt: "2026-06-02T01:10:00Z",
+    username: "kasubag.kp2",
+    password: "bank123"
   },
   {
     email: "kabag.kredit2@banktulungagung.co.id",
@@ -125,7 +147,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504012010720002",
     officeId: "kp2-pusat",
     status: "APPROVED",
-    createdAt: "2026-06-02T01:20:00Z"
+    createdAt: "2026-06-02T01:20:00Z",
+    username: "kabag.kredit2",
+    password: "bank123"
   },
   // Cabang Campurdarat
   {
@@ -135,7 +159,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504104205930005",
     officeId: "cab-bandung",
     status: "APPROVED",
-    createdAt: "2026-06-03T02:00:00Z"
+    createdAt: "2026-06-03T02:00:00Z",
+    username: "mo.anita",
+    password: "bank123"
   },
   {
     email: "kasubag.campurdarat@banktulungagung.co.id",
@@ -144,7 +170,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504121510850001",
     officeId: "cab-campurdarat",
     status: "APPROVED",
-    createdAt: "2026-06-03T02:10:00Z"
+    createdAt: "2026-06-03T02:10:00Z",
+    username: "kasubag.campurdarat",
+    password: "bank123"
   },
   {
     email: "pimpinan.campurdarat@banktulungagung.co.id",
@@ -153,7 +181,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504011212700001",
     officeId: "cab-campurdarat",
     status: "APPROVED",
-    createdAt: "2026-06-03T02:20:00Z"
+    createdAt: "2026-06-03T02:20:00Z",
+    username: "pimpinan.campurdarat",
+    password: "bank123"
   },
   // PENDING Registration Mock accounts to show User Approval feature!
   {
@@ -163,7 +193,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504151205970002",
     officeId: "cab-boyolangu",
     status: "PENDING",
-    createdAt: "2026-06-04T01:30:00Z"
+    createdAt: "2026-06-04T01:30:00Z",
+    username: "mo.lapangan",
+    password: "bank123"
   },
   {
     email: "kasubag.baru@banktulungagung.co.id",
@@ -172,7 +204,9 @@ const INITIAL_USERS: FieldUser[] = [
     nik: "3504054412900001",
     officeId: "kp1-ngemplak",
     status: "PENDING",
-    createdAt: "2026-06-04T03:45:00Z"
+    createdAt: "2026-06-04T03:45:00Z",
+    username: "kasubag.baru",
+    password: "bank123"
   }
 ];
 
@@ -539,108 +573,15 @@ interface SavedState {
 }
 
 function loadDatabase(): SavedState {
-  try {
-    let db: SavedState;
-    if (fs.existsSync(DB_FILE)) {
-      const data = fs.readFileSync(DB_FILE, "utf-8");
-      db = JSON.parse(data);
-    } else {
-      db = { surveys: INITIAL_SURVEYS, users: INITIAL_USERS };
-      fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), "utf-8");
-    }
-
-    // Ensure database migration/compatibility mapping for photos and coordinates
-    if (db && db.surveys) {
-      db.surveys = db.surveys.map((s: any) => {
-        if (!s.photoKtp) s.photoKtp = "https://images.unsplash.com/photo-1554774853-aae0a22c8aa4?w=400";
-        if (!s.photoDebitur) s.photoDebitur = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400";
-        
-        if (!s.surveyPhotos) {
-          s.surveyPhotos = { rumah: [], usaha: [], stok: [], agunan: [] };
-        }
-        
-        const categories = ["rumah", "usaha", "stok", "agunan"] as const;
-        categories.forEach(cat => {
-          const val = s.surveyPhotos[cat];
-          if (!val) {
-            s.surveyPhotos[cat] = [
-              "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
-              "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
-              "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
-              "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400"
-            ];
-          } else if (typeof val === "string") {
-            s.surveyPhotos[cat] = [val, val, val, val];
-          } else if (Array.isArray(val)) {
-            while (s.surveyPhotos[cat].length < 4) {
-              s.surveyPhotos[cat].push(val[0] || "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400");
-            }
-          }
-        });
-
-        if (!s.photoCoordinates) {
-          s.photoCoordinates = { rumah: [], usaha: [], stok: [], agunan: [] };
-        }
-        categories.forEach(cat => {
-          const val = s.photoCoordinates[cat];
-          if (!val) {
-            s.photoCoordinates[cat] = [null, null, null, null];
-          } else if (!Array.isArray(val)) {
-            s.photoCoordinates[cat] = [val, null, null, null];
-          } else {
-            while (s.photoCoordinates[cat].length < 4) {
-              s.photoCoordinates[cat].push(null);
-            }
-          }
-        });
-
-        // Initialize multiple physical collaterals list if absent
-        if (!s.collaterals || !s.collaterals.length) {
-          s.collaterals = [
-            {
-              id: `col-${s.id}-1`,
-              type: s.collateralType || "BPKB",
-              description: s.collateralDescription || "Agunan Utama",
-              value: Number(s.collateralValue) || 0
-            }
-          ];
-        }
-
-        // Initialize multiple active SLIK loans list if absent
-        if (!s.slikActiveLoans || !s.slikActiveLoans.length) {
-          s.slikActiveLoans = [
-            {
-              id: `slik-${s.id}-1`,
-              bankName: "Bank Mandiri / BRI / LJK Lain",
-              plafond: 25000000,
-              bakidebet: 15000000,
-              monthlyInstallment: 750000,
-              collectibility: s.slikStatus || "KOL-1 (LANCAR)"
-            }
-          ];
-        }
-
-        return s;
-      });
-    }
-
-    return db;
-  } catch (ex) {
-    console.error("Failed to load DB file falling back to in-memory seed", ex);
-    return { surveys: INITIAL_SURVEYS, users: INITIAL_USERS };
-  }
+  return { surveys: [], users: INITIAL_USERS };
 }
 
 function saveDatabase(state: SavedState) {
-  try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(state, null, 2), "utf-8");
-  } catch (error) {
-    console.error("Failed to save database state to file system", error);
-  }
+  // Migrated to Firestore: no-op
 }
 
-// Ensure database file is generated immediately
-loadDatabase();
+// Legacy helper function bypass - database fully provisioned via Firestore
+// loadDatabase();
 
 // Initialize GoogleGenAI client nicely
 let ai: GoogleGenAI | null = null;
@@ -661,319 +602,438 @@ if (process.env.GEMINI_API_KEY) {
 }
 
 // -------------------------------------------------------------
-// USER ENDPOINTS
+// USER ENDPOINTS (FIRESTORE BACKED)
 // -------------------------------------------------------------
 
 // Get all users
-app.get("/api/users", (req, res) => {
-  const db = loadDatabase();
-  res.json(db.users);
+app.get("/api/users", async (req, res) => {
+  try {
+    const usersCol = collection(dbFirestore, "users");
+    const snapshot = await getDocs(usersCol);
+    let users = snapshot.docs.map(doc => {
+      const u = doc.data() as FieldUser;
+      let changed = false;
+      if (!u.username) {
+        u.username = u.email.split("@")[0].toLowerCase();
+        changed = true;
+      }
+      if (!u.password) {
+        u.password = "bank123";
+        changed = true;
+      }
+      if (changed) {
+        // Asynchronously update in firestore to persist compatibility fields
+        setDoc(doc.ref, u).catch(err => console.error("Gagal migrasi data user:", err));
+      }
+      return u;
+    });
+    
+    // Auto-seed baseline staff demo accounts if they don't exist in Firestore
+    if (users.length === 0) {
+      console.log("Seeding baseline users to Firestore...");
+      for (const u of INITIAL_USERS) {
+        await setDoc(doc(dbFirestore, "users", u.email.toLowerCase()), u);
+      }
+      users = INITIAL_USERS;
+    }
+    res.json(users);
+  } catch (error) {
+    console.error("Firestore error on /api/users GET:", error);
+    res.status(500).json({ error: "Gagal berinteraksi dengan database Firestore" });
+  }
 });
 
-// Update or Approve user
-app.post("/api/users/:email/status", (req, res) => {
+// Update or Approve user status
+app.post("/api/users/:email/status", async (req, res) => {
   const { email } = req.params;
-  const { status } = req.body; // status: 'APPROVED' | 'REJECTED'
-  const db = loadDatabase();
+  const { status } = req.body;
   
-  const userIdx = db.users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
-  if (userIdx < 0) {
-    return res.status(404).json({ error: "User tidak ditemukan" });
+  try {
+    const userDocRef = doc(dbFirestore, "users", email.toLowerCase());
+    const userDoc = await getDoc(userDocRef);
+    if (!userDoc.exists()) {
+      return res.status(404).json({ error: "User tidak ditemukan" });
+    }
+    
+    const userData = userDoc.data() as FieldUser;
+    userData.status = status;
+    await setDoc(userDocRef, userData);
+    res.json({ success: true, user: userData });
+  } catch (error) {
+    console.error("Firestore error on user status update:", error);
+    res.status(500).json({ error: "Gagal menyimpan perubahan status user" });
   }
-
-  db.users[userIdx].status = status;
-  saveDatabase(db);
-  res.json({ success: true, user: db.users[userIdx] });
 });
 
 // User self registration
-app.post("/api/register", (req, res) => {
-  const { email, name, role, nik, officeId } = req.body;
+app.post("/api/register", async (req, res) => {
+  const { email, name, role, nik, officeId, username, password } = req.body;
   
-  if (!email || !name || !role || !nik || !officeId) {
-    return res.status(400).json({ error: "Seluruh bidang registrasi harus diisi lengkap (Email, Nama, Role, NIK, Kantor)." });
+  if (!email || !name || !role || !nik || !officeId || !username || !password) {
+    return res.status(400).json({ error: "Seluruh bidang registrasi harus diisi lengkap (Email, Nama, Role, NIK, Kantor, Username, Password)." });
   }
 
-  const db = loadDatabase();
-  const existing = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-  if (existing) {
-    return res.status(400).json({ error: "Alamat email ini sudah terdaftar sebelumnya." });
+  const cleanUsername = username.trim().toLowerCase();
+
+  try {
+    const userDocRef = doc(dbFirestore, "users", email.toLowerCase());
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      return res.status(400).json({ error: "Alamat email ini sudah terdaftar sebelumnya." });
+    }
+
+    // Check if username is already taken by querying firestore
+    const usersCol = collection(dbFirestore, "users");
+    const snapshot = await getDocs(usersCol);
+    const existingUsers = snapshot.docs.map(doc => doc.data() as FieldUser);
+    const usernameTaken = existingUsers.some(u => (u.username || "").toLowerCase() === cleanUsername);
+
+    if (usernameTaken) {
+      return res.status(400).json({ error: `Username '${username}' sudah digunakan oleh pegawai lain. Harap pilih username lain.` });
+    }
+
+    const newUser: FieldUser = {
+      email: email.toLowerCase(),
+      name,
+      role,
+      nik,
+      officeId,
+      status: "PENDING",
+      createdAt: new Date().toISOString(),
+      username: cleanUsername,
+      password: password
+    };
+
+    await setDoc(userDocRef, newUser);
+    res.status(201).json({ success: true, user: newUser });
+  } catch (error) {
+    console.error("Firestore error on user register:", error);
+    res.status(500).json({ error: "Gagal melakukan registrasi" });
   }
-
-  const newUser: FieldUser = {
-    email: email.toLowerCase(),
-    name,
-    role,
-    nik,
-    officeId,
-    status: "PENDING", // needs admin approval
-    createdAt: new Date().toISOString()
-  };
-
-  db.users.push(newUser);
-  saveDatabase(db);
-  res.status(201).json({ success: true, user: newUser });
 });
 
-// Reset application data (Seeding)
-app.post("/api/reset-data", (req, res) => {
-  const state: SavedState = { surveys: INITIAL_SURVEYS, users: INITIAL_USERS };
-  saveDatabase(state);
-  res.json({ success: true, surveys: INITIAL_SURVEYS, users: INITIAL_USERS });
+// Reset application data (Deletes all surveys, restores baseline users)
+app.post("/api/reset-data", async (req, res) => {
+  try {
+    // Delete all surveys (to start completely fresh without dummy surveys!)
+    const surveysCol = collection(dbFirestore, "surveys");
+    const surveysSnapshot = await getDocs(surveysCol);
+    for (const d of surveysSnapshot.docs) {
+      await deleteDoc(doc(dbFirestore, "surveys", d.id));
+    }
+    
+    // Delete and re-seed baseline users
+    const usersCol = collection(dbFirestore, "users");
+    const usersSnapshot = await getDocs(usersCol);
+    for (const d of usersSnapshot.docs) {
+      await deleteDoc(doc(dbFirestore, "users", d.id));
+    }
+    
+    for (const u of INITIAL_USERS) {
+      await setDoc(doc(dbFirestore, "users", u.email.toLowerCase()), u);
+    }
+    
+    res.json({ success: true, surveys: [], users: INITIAL_USERS });
+  } catch (error) {
+    console.error("Firestore error on database reset:", error);
+    res.status(500).json({ error: "Gagal mengosongkan database" });
+  }
 });
 
 // -------------------------------------------------------------
-// SURVEYS ENDPOINTS
+// SURVEYS ENDPOINTS (FIRESTORE BACKED)
 // -------------------------------------------------------------
 
-app.get("/api/surveys", (req, res) => {
-  const db = loadDatabase();
-  res.json(db.surveys);
+// Get all surveys
+app.get("/api/surveys", async (req, res) => {
+  try {
+    const surveysCol = collection(dbFirestore, "surveys");
+    const snapshot = await getDocs(surveysCol);
+    const surveys = snapshot.docs.map(doc => doc.data() as CreditSurvey);
+    
+    // Sort descending by creation date
+    surveys.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    res.json(surveys);
+  } catch (error) {
+    console.error("Firestore error on surveys fetch:", error);
+    res.status(500).json({ error: "Gagal mengambil data survei" });
+  }
 });
 
-app.post("/api/surveys", (req, res) => {
+// Create or update physical credit survey
+app.post("/api/surveys", async (req, res) => {
   const data = req.body as Partial<CreditSurvey>;
-  const db = loadDatabase();
   const now = new Date().toISOString();
   
   if (!data.borrowerName) {
     return res.status(400).json({ error: "Nama calon debitur wajib diisi." });
   }
 
-  const existingIndex = db.surveys.findIndex(s => s.id === data.id);
-
-  if (existingIndex >= 0) {
-    // Merge existing
-    const current = db.surveys[existingIndex];
-    const revenue = data.monthlyRevenue ?? current.monthlyRevenue;
-    const expense = data.monthlyExpenses ?? current.monthlyExpenses;
-    const s = data.scheme ?? current.scheme;
-    const rAmount = data.requestedAmount ?? current.requestedAmount;
-    const rTenor = data.requestedTenor ?? current.requestedTenor;
+  try {
+    let surveyId = data.id;
+    let isEditing = false;
+    let current: CreditSurvey | null = null;
     
-    let stats = data.status ?? current.status;
-    let notes = data.moNotes ?? current.moNotes;
-    
-    if (s === 'PAYROLL') {
-      const estInstallment = rAmount / rTenor;
-      const maxPayroll = revenue * 0.9;
-      if (estInstallment > maxPayroll || rTenor > 120) {
-        stats = 'REJECTED';
-        notes = (notes ? notes.replace(/\[AUTO REJECTED - .*?\]/g, "").trim() + " \n" : "") + `[AUTO REJECTED - Angsuran Rp ${Math.round(estInstallment).toLocaleString('id-ID')} melebihi 90% gaji Rp ${Math.round(maxPayroll).toLocaleString('id-ID')} atau tenor >120 bulan]`;
-      }
-    }
-    
-    const updated: CreditSurvey = {
-      ...current,
-      ...data,
-      status: stats,
-      moNotes: notes,
-      netMonthlyIncome: revenue - expense,
-      updatedAt: now
-    } as CreditSurvey;
-    db.surveys[existingIndex] = updated;
-    saveDatabase(db);
-    res.json(updated);
-  } else {
-    // Generate new unique micro ID
-    const newId = `SRV-2026-${String(db.surveys.length + 1).padStart(3, '0')}`;
-    
-    const revenue = data.monthlyRevenue ?? 0;
-    const expense = data.monthlyExpenses ?? 0;
-    const s = data.scheme || "PJI";
-    const rAmount = Number(data.requestedAmount) || 0;
-    const rTenor = Number(data.requestedTenor) || 12;
-    
-    let stats = "DRAFT";
-    let notes = data.moNotes || "";
-    
-    if (s === 'PAYROLL') {
-      const estInstallment = rAmount / rTenor;
-      const maxPayroll = revenue * 0.9;
-      if (estInstallment > maxPayroll || rTenor > 120) {
-        stats = 'REJECTED';
-        notes = (notes ? notes + " \n" : "") + `[AUTO REJECTED - Angsuran Rp ${Math.round(estInstallment).toLocaleString('id-ID')} melebihi 90% gaji Rp ${Math.round(maxPayroll).toLocaleString('id-ID')} atau tenor >120 bulan]`;
+    if (surveyId) {
+      const surveyDocRef = doc(dbFirestore, "surveys", surveyId);
+      const surveyDoc = await getDoc(surveyDocRef);
+      if (surveyDoc.exists()) {
+        isEditing = true;
+        current = surveyDoc.data() as CreditSurvey;
       }
     }
 
-    const newSurvey: CreditSurvey = {
-      id: newId,
-      borrowerName: data.borrowerName,
-      nik: data.nik || "",
-      phone: data.phone || "",
-      address: data.address || "",
-      businessType: data.businessType || "Komersial",
-      businessAge: Number(data.businessAge) || 1,
-      requestedAmount: rAmount,
-      requestedTenor: rTenor,
-      monthlyRevenue: revenue,
-      monthlyExpenses: expense,
-      netMonthlyIncome: revenue - expense,
-      collateralType: data.collateralType || "TANPA_AGUNAN",
-      collateralDescription: data.collateralDescription || "",
-      collateralValue: Number(data.collateralValue) || 0,
-      collaterals: data.collaterals || [
-        {
-          id: `col-new-${Date.now()}`,
-          type: data.collateralType || "BPKB",
-          description: data.collateralDescription || "Agunan Utama",
-          value: Number(data.collateralValue) || 0
+    if (isEditing && current) {
+      // Merge existing
+      const revenue = data.monthlyRevenue ?? current.monthlyRevenue;
+      const expense = data.monthlyExpenses ?? current.monthlyExpenses;
+      const s = data.scheme ?? current.scheme;
+      const rAmount = data.requestedAmount ?? current.requestedAmount;
+      const rTenor = data.requestedTenor ?? current.requestedTenor;
+      
+      let stats = data.status ?? current.status;
+      let notes = data.moNotes ?? current.moNotes;
+      
+      if (s === 'PAYROLL') {
+        const estInstallment = rAmount / rTenor;
+        const maxPayroll = revenue * 0.9;
+        if (estInstallment > maxPayroll || rTenor > 120) {
+          stats = 'REJECTED';
+          notes = (notes ? notes.replace(/\[AUTO REJECTED - .*?\]/g, "").trim() + " \n" : "") + `[AUTO REJECTED - Angsuran Rp ${Math.round(estInstallment).toLocaleString('id-ID')} melebihi 90% gaji Rp ${Math.round(maxPayroll).toLocaleString('id-ID')} atau tenor >120 bulan]`;
         }
-      ],
-      slikActiveLoans: data.slikActiveLoans || [
-        {
-          id: `slik-new-${Date.now()}`,
-          bankName: "Tidak ada / Bersih",
-          plafond: 0,
-          bakidebet: 0,
-          monthlyInstallment: 0,
-          collectibility: data.slikStatus || "KOL-1 (LANCAR)"
+      }
+      
+      const updated: CreditSurvey = {
+        ...current,
+        ...data,
+        status: stats,
+        moNotes: notes,
+        netMonthlyIncome: revenue - expense,
+        updatedAt: now
+      } as CreditSurvey;
+      
+      await setDoc(doc(dbFirestore, "surveys", surveyId!), updated);
+      res.json(updated);
+    } else {
+      // Generate unique micro ID based on count of documents
+      const surveysCol = collection(dbFirestore, "surveys");
+      const snapshot = await getDocs(surveysCol);
+      const count = snapshot.size;
+      const newId = `SRV-2026-${String(count + 1).padStart(3, '0')}`;
+      
+      const revenue = data.monthlyRevenue ?? 0;
+      const expense = data.monthlyExpenses ?? 0;
+      const s = data.scheme || "PJI";
+      const rAmount = Number(data.requestedAmount) || 0;
+      const rTenor = Number(data.requestedTenor) || 12;
+      
+      let stats = "DRAFT";
+      let notes = data.moNotes || "";
+      
+      if (s === 'PAYROLL') {
+        const estInstallment = rAmount / rTenor;
+        const maxPayroll = revenue * 0.9;
+        if (estInstallment > maxPayroll || rTenor > 120) {
+          stats = 'REJECTED';
+          notes = (notes ? notes + " \n" : "") + `[AUTO REJECTED - Angsuran Rp ${Math.round(estInstallment).toLocaleString('id-ID')} melebihi 90% gaji Rp ${Math.round(maxPayroll).toLocaleString('id-ID')} atau tenor >120 bulan]`;
         }
-      ],
-      moNotes: notes,
-      gpsLatitude: data.gpsLatitude ?? -8.1132,
-      gpsLongitude: data.gpsLongitude ?? 111.9025,
-      gpsAddress: data.gpsAddress || "Tulungagung, Jawa Timur",
-      photoUrl: data.photoUrl || null,
-      photoKtp: data.photoKtp || "https://images.unsplash.com/photo-1554774853-aae0a22c8aa4?w=400",
-      photoDebitur: data.photoDebitur || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
-      surveyPhotos: {
-        rumah: data.surveyPhotos?.rumah || [
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400"
+      }
+
+      const newSurvey: CreditSurvey = {
+        id: newId,
+        borrowerName: data.borrowerName,
+        nik: data.nik || "",
+        phone: data.phone || "",
+        address: data.address || "",
+        businessType: data.businessType || "Komersial",
+        businessAge: Number(data.businessAge) || 1,
+        requestedAmount: rAmount,
+        requestedTenor: rTenor,
+        monthlyRevenue: revenue,
+        monthlyExpenses: expense,
+        netMonthlyIncome: revenue - expense,
+        collateralType: data.collateralType || "TANPA_AGUNAN",
+        collateralDescription: data.collateralDescription || "",
+        collateralValue: Number(data.collateralValue) || 0,
+        collaterals: data.collaterals || [
+          {
+            id: `col-new-${Date.now()}`,
+            type: data.collateralType || "BPKB",
+            description: data.collateralDescription || "Agunan Utama",
+            value: Number(data.collateralValue) || 0
+          }
         ],
-        usaha: data.surveyPhotos?.usaha || [
-          "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400",
-          "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400",
-          "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400",
-          "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400"
+        slikActiveLoans: data.slikActiveLoans || [
+          {
+            id: `slik-new-${Date.now()}`,
+            bankName: "Tidak ada / Bersih",
+            plafond: 0,
+            bakidebet: 0,
+            monthlyInstallment: 0,
+            collectibility: data.slikStatus || "KOL-1 (LANCAR)"
+          }
         ],
-        stok: data.surveyPhotos?.stok || [
-          "https://images.unsplash.com/photo-1581094288338-2314dddb7eed?w=400",
-          "https://images.unsplash.com/photo-1581094288338-2314dddb7eed?w=400",
-          "https://images.unsplash.com/photo-1581094288338-2314dddb7eed?w=400",
-          "https://images.unsplash.com/photo-1581094288338-2314dddb7eed?w=400"
-        ],
-        agunan: data.surveyPhotos?.agunan || [
-          "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400",
-          "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400",
-          "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400",
-          "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400"
-        ]
-      },
-      photoCoordinates: data.photoCoordinates || {
-        rumah: [null, null, null, null],
-        usaha: [null, null, null, null],
-        stok: [null, null, null, null],
-        agunan: [null, null, null, null]
-      },
-      status: stats as any,
-      createdAt: now,
-      updatedAt: now,
-      surveyorEmail: data.surveyorEmail || "mo.kurniawan@banktulungagung.co.id",
-      officeId: data.officeId || "kp1-kauman",
-      scheme: s as any,
-      scores5c: {
-        character: data.scores5c?.character ?? 70,
-        capacity: data.scores5c?.capacity ?? 70,
-        capital: data.scores5c?.capital ?? 70,
-        collateral: data.scores5c?.collateral ?? 70,
-        condition: data.scores5c?.condition ?? 70,
-        qCharacter: data.scores5c?.qCharacter || "",
-        qCapacity: data.scores5c?.qCapacity || "",
-        qCapital: data.scores5c?.qCapital || "",
-        qCollateral: data.scores5c?.qCollateral || "",
-        qCondition: data.scores5c?.qCondition || ""
-      },
-      kasubagEmail: null,
-      kasubagNotes: null,
-      kasubagApprovedAmount: null,
-      kasubagActionAt: null,
-      kabagEmail: null,
-      kabagNotes: null,
-      kabagApprovedAmount: null,
-      kabagActionAt: null,
-      ewsScore: 3,
-      aiAnalysis: null
-    };
-    db.surveys.push(newSurvey);
-    saveDatabase(db);
-    res.status(201).json(newSurvey);
+        moNotes: notes,
+        gpsLatitude: data.gpsLatitude ?? -8.1132,
+        gpsLongitude: data.gpsLongitude ?? 111.9025,
+        gpsAddress: data.gpsAddress || "Tulungagung, Jawa Timur",
+        photoUrl: data.photoUrl || null,
+        photoKtp: data.photoKtp || "https://images.unsplash.com/photo-1554774853-aae0a22c8aa4?w=400",
+        photoDebitur: data.photoDebitur || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+        surveyPhotos: {
+          rumah: data.surveyPhotos?.rumah || [
+            "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+            "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+            "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400",
+            "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400"
+          ],
+          usaha: data.surveyPhotos?.usaha || [
+            "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400",
+            "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400",
+            "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400",
+            "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400"
+          ],
+          stok: data.surveyPhotos?.stok || [
+            "https://images.unsplash.com/photo-1581094288338-2314dddb7eed?w=400",
+            "https://images.unsplash.com/photo-1581094288338-2314dddb7eed?w=400",
+            "https://images.unsplash.com/photo-1581094288338-2314dddb7eed?w=400",
+            "https://images.unsplash.com/photo-1581094288338-2314dddb7eed?w=400"
+          ],
+          agunan: data.surveyPhotos?.agunan || [
+            "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400",
+            "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400",
+            "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400",
+            "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400"
+          ]
+        },
+        photoCoordinates: data.photoCoordinates || {
+          rumah: [null, null, null, null],
+          usaha: [null, null, null, null],
+          stok: [null, null, null, null],
+          agunan: [null, null, null, null]
+        },
+        status: stats as any,
+        createdAt: now,
+        updatedAt: now,
+        surveyorEmail: data.surveyorEmail || "mo.kurniawan@banktulungagung.co.id",
+        officeId: data.officeId || "kp1-kauman",
+        scheme: s as any,
+        scores5c: {
+          character: data.scores5c?.character ?? 70,
+          capacity: data.scores5c?.capacity ?? 70,
+          capital: data.scores5c?.capital ?? 70,
+          collateral: data.scores5c?.collateral ?? 70,
+          condition: data.scores5c?.condition ?? 70,
+          qCharacter: data.scores5c?.qCharacter || "",
+          qCapacity: data.scores5c?.qCapacity || "",
+          qCapital: data.scores5c?.qCapital || "",
+          qCollateral: data.scores5c?.qCollateral || "",
+          qCondition: data.scores5c?.qCondition || ""
+        },
+        kasubagEmail: null,
+        kasubagNotes: null,
+        kasubagApprovedAmount: null,
+        kasubagActionAt: null,
+        kabagEmail: null,
+        kabagNotes: null,
+        kabagApprovedAmount: null,
+        kabagActionAt: null,
+        ewsScore: 3,
+        aiAnalysis: null
+      };
+      
+      await setDoc(doc(dbFirestore, "surveys", newId), newSurvey);
+      res.status(201).json(newSurvey);
+    }
+  } catch (error) {
+    console.error("Firestore error on survey create/update:", error);
+    res.status(500).json({ error: "Gagal menyimpan survei ke database" });
   }
-
 });
 
-app.delete("/api/surveys/:id", (req, res) => {
+// Delete target survey
+app.delete("/api/surveys/:id", async (req, res) => {
   const { id } = req.params;
-  const db = loadDatabase();
-  const index = db.surveys.findIndex(s => s.id === id);
-  if (index < 0) {
-    return res.status(404).json({ error: "Survei tidak ditemukan" });
+  try {
+    const surveyDocRef = doc(dbFirestore, "surveys", id);
+    const surveyDoc = await getDoc(surveyDocRef);
+    if (!surveyDoc.exists()) {
+      return res.status(404).json({ error: "Survei tidak ditemukan" });
+    }
+    await deleteDoc(surveyDocRef);
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Firestore error on survey delete:", error);
+    res.status(500).json({ error: "Gagal menghapus survei dari database" });
   }
-  db.surveys.splice(index, 1);
-  saveDatabase(db);
-  res.json({ success: true });
 });
 
 // Kasubag Review (Tier 1 Approval)
-app.post("/api/surveys/:id/kasubag-review", (req, res) => {
+app.post("/api/surveys/:id/kasubag-review", async (req, res) => {
   const { id } = req.params;
   const { notes, approvedAmount, kasubagEmail } = req.body;
-  const db = loadDatabase();
   
-  const idx = db.surveys.findIndex(s => s.id === id);
-  if (idx < 0) return res.status(404).json({ error: "Survei tidak ditemukan" });
-  
-  const current = db.surveys[idx];
-  current.status = "REVIEWED_KASUBAG";
-  current.kasubagNotes = notes;
-  current.kasubagApprovedAmount = Number(approvedAmount) || current.requestedAmount;
-  current.kasubagEmail = kasubagEmail || "kasubag.kp1@banktulungagung.co.id";
-  current.kasubagActionAt = new Date().toISOString();
-  current.updatedAt = new Date().toISOString();
-  
-  db.surveys[idx] = current;
-  saveDatabase(db);
-  res.json(current);
+  try {
+    const surveyDocRef = doc(dbFirestore, "surveys", id);
+    const surveyDoc = await getDoc(surveyDocRef);
+    if (!surveyDoc.exists()) return res.status(404).json({ error: "Survei tidak ditemukan" });
+    
+    const current = surveyDoc.data() as CreditSurvey;
+    current.status = "REVIEWED_KASUBAG";
+    current.kasubagNotes = notes;
+    current.kasubagApprovedAmount = Number(approvedAmount) || current.requestedAmount;
+    current.kasubagEmail = kasubagEmail || "kasubag.kp1@banktulungagung.co.id";
+    current.kasubagActionAt = new Date().toISOString();
+    current.updatedAt = new Date().toISOString();
+    
+    await setDoc(surveyDocRef, current);
+    res.json(current);
+  } catch (error) {
+    console.error("Firestore error on Kasubag review:", error);
+    res.status(500).json({ error: "Gagal menyimpan peninjauan Kasubag" });
+  }
 });
 
 // Kabag Review (Tier 2 Approved/Rejected)
-app.post("/api/surveys/:id/kabag-review", (req, res) => {
+app.post("/api/surveys/:id/kabag-review", async (req, res) => {
   const { id } = req.params;
   const { decision, notes, approvedAmount, kabagEmail } = req.body; // decision: APPROVED or REJECTED
-  const db = loadDatabase();
   
-  const idx = db.surveys.findIndex(s => s.id === id);
-  if (idx < 0) return res.status(404).json({ error: "Survei tidak ditemukan" });
-  
-  const current = db.surveys[idx];
-  if (decision !== "APPROVED" && decision !== "REJECTED") {
-    return res.status(400).json({ error: "Keputusan harus APPROVED atau REJECTED" });
+  try {
+    const surveyDocRef = doc(dbFirestore, "surveys", id);
+    const surveyDoc = await getDoc(surveyDocRef);
+    if (!surveyDoc.exists()) return res.status(404).json({ error: "Survei tidak ditemukan" });
+    
+    const current = surveyDoc.data() as CreditSurvey;
+    if (decision !== "APPROVED" && decision !== "REJECTED") {
+      return res.status(400).json({ error: "Keputusan harus APPROVED atau REJECTED" });
+    }
+    
+    current.status = decision;
+    current.kabagNotes = notes;
+    current.kabagApprovedAmount = decision === "APPROVED" ? (Number(approvedAmount) || current.kasubagApprovedAmount || current.requestedAmount) : 0;
+    current.kabagEmail = kabagEmail || "kabag.kredit1@banktulungagung.co.id";
+    current.kabagActionAt = new Date().toISOString();
+    current.updatedAt = new Date().toISOString();
+    
+    await setDoc(surveyDocRef, current);
+    res.json(current);
+  } catch (error) {
+    console.error("Firestore error on Kabag review:", error);
+    res.status(500).json({ error: "Gagal menyimpan keputusan Kabag" });
   }
-  
-  current.status = decision;
-  current.kabagNotes = notes;
-  current.kabagApprovedAmount = decision === "APPROVED" ? (Number(approvedAmount) || current.kasubagApprovedAmount || current.requestedAmount) : 0;
-  current.kabagEmail = kabagEmail || "kabag.kredit1@banktulungagung.co.id";
-  current.kabagActionAt = new Date().toISOString();
-  current.updatedAt = new Date().toISOString();
-  
-  db.surveys[idx] = current;
-  saveDatabase(db);
-  res.json(current);
 });
 
 // Gemini AI analysis endpoint
 app.post("/api/surveys/:id/analyze", async (req, res) => {
   const { id } = req.params;
-  const db = loadDatabase();
   
-  const idx = db.surveys.findIndex(s => s.id === id);
-  if (idx < 0) return res.status(404).json({ error: "Survei tidak ditemukan" });
-  
-  const survey = db.surveys[idx];
+  try {
+    const surveyDocRef = doc(dbFirestore, "surveys", id);
+    const surveyDoc = await getDoc(surveyDocRef);
+    if (!surveyDoc.exists()) return res.status(404).json({ error: "Survei tidak ditemukan" });
+    
+    const survey = surveyDoc.data() as CreditSurvey;
   
   const prompt = `Lakukan evaluasi kelayakan risiko survei kredit mikro perbankan menggunakan prinsip 5C (Character, Capacity, Capital, Collateral, Condition) untuk nasabah Tulungagung:
 - Nama Calon Debitur: ${survey.borrowerName}
@@ -1098,9 +1158,12 @@ Berikan keluaran terstruktur dengan format JSON yang berisi objek analisis kredi
   
   survey.ewsScore = Math.min(10, Math.max(1, ewsIdx));
   
-  db.surveys[idx] = survey;
-  saveDatabase(db);
+  await setDoc(surveyDocRef, survey);
   res.json(survey);
+  } catch (error) {
+    console.error("Firestore error on /api/surveys/:id/analyze:", error);
+    res.status(500).json({ error: "Gagal memproses analisa kredit" });
+  }
 });
 
 function runManual5cSimulation(survey: CreditSurvey): AIAnalysis {

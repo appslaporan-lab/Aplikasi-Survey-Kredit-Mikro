@@ -1,0 +1,65 @@
+{
+  "entities": {
+    "user": {
+      "title": "User",
+      "description": "Staff profile of BPR Bank Tulungagung.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "description": "Email identifier" },
+        "name": { "type": "string", "description": "Full name of the user" },
+        "role": { "type": "string", "enum": ["ADMIN", "MO", "KASUBAG", "KABAG"], "description": "Role type" },
+        "nik": { "type": "string", "description": "NIK number" },
+        "officeId": { "type": "string", "description": "Office identifier" },
+        "status": { "type": "string", "enum": ["APPROVED", "PENDING", "REJECTED"], "description": "Approval status" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account registration timestamp" }
+      },
+      "required": ["email", "name", "role", "nik", "officeId", "status"]
+    },
+    "survey": {
+      "title": "Credit Survey",
+      "description": "Micro-credit risk analysis survey form.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique survey ID starting with SRV" },
+        "borrowerName": { "type": "string", "description": "Borrower's full name" },
+        "nik": { "type": "string", "description": "Borrower's NIK" },
+        "phone": { "type": "string", "description": "Borrower's phone number" },
+        "address": { "type": "string", "description": "Borrower's residential address" },
+        "businessType": { "type": "string", "description": "Business sector or type" },
+        "businessAge": { "type": "number", "description": "Age of business in years" },
+        "requestedAmount": { "type": "number", "description": "Requested credit limit" },
+        "requestedTenor": { "type": "number", "description": "Requested tenor in months" },
+        "monthlyRevenue": { "type": "number", "description": "Monthly gross revenues" },
+        "monthlyExpenses": { "type": "number", "description": "Monthly operations & living expenses" },
+        "netMonthlyIncome": { "type": "number", "description": "Monthly net income" },
+        "collateralType": { "type": "string", "description": "Collateral type (e.g. SHM, BPKB)" },
+        "collateralDescription": { "type": "string", "description": "Collateral physical details" },
+        "collateralValue": { "type": "number", "description": "Appraised collateral valuation" },
+        "moNotes": { "type": "string", "description": "Surveyor/MO comments" },
+        "gpsLatitude": { "type": "number", "description": "GPS Latitude coordinate" },
+        "gpsLongitude": { "type": "number", "description": "GPS Longitude coordinate" },
+        "gpsAddress": { "type": "string", "description": "GPS address location string" },
+        "photoUrl": { "type": "string" },
+        "photoKtp": { "type": "string" },
+        "photoDebitur": { "type": "string" },
+        "status": { "type": "string", "enum": ["DRAFT", "SUBMITTED_MO", "REVIEWED_KASUBAG", "APPROVED", "REJECTED"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "surveyorEmail": { "type": "string" },
+        "officeId": { "type": "string" },
+        "scheme": { "type": "string" }
+      },
+      "required": ["id", "borrowerName", "status", "createdAt", "surveyorEmail", "officeId"]
+    }
+  },
+  "firestore": {
+    "users/{email}": {
+      "schema": "user",
+      "description": "User registration record mapped by lowercase email text"
+    },
+    "surveys/{id}": {
+      "schema": "survey",
+      "description": "Credit surveys list"
+    }
+  }
+}

@@ -143,6 +143,8 @@ export interface FieldUser {
   officeId: string;
   status: UserApprovalStatus;
   createdAt: string;
+  username?: string;
+  password?: string;
 }
 
 export interface UserSession {
@@ -152,6 +154,7 @@ export interface UserSession {
   nik: string;
   officeId: string;
   status?: UserApprovalStatus;
+  username?: string;
 }
 
 export interface Office {

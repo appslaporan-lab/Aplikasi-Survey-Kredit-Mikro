@@ -78,6 +78,10 @@ export default function CreditSurveyForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // States to track auto-saved draft status
+  const [hasDraft, setHasDraft] = useState(false);
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+
   // New states for dynamic sector analysis, SLIK, and photo coords
   const [slikStatus, setSlikStatus] = useState("KOL-1 (LANCAR)");
   const [sectorType, setSectorType] = useState<'UMUM' | 'PERIKANAN' | 'PERTANIAN' | 'PETERNAKAN' | 'PAYROLL'>("UMUM");
@@ -125,7 +129,7 @@ export default function CreditSurveyForm({
     agunan: [null, null, null, null]
   });
 
-  // Load defaults if edit mode
+  // Load defaults or restore draft if edit mode / create mode
   useEffect(() => {
     if (surveyToEdit) {
       setBorrowerName(surveyToEdit.borrowerName);
@@ -209,11 +213,208 @@ export default function CreditSurveyForm({
           agunan: [null, null, null, null]
         });
       }
+      setHasDraft(false);
+      setDraftSavedAt(null);
     } else {
-      // Clear values for new template
-      resetToEmptyForm();
+      // Create mode - check if pre-existing draft exists in local storage
+      const saved = localStorage.getItem("bpr_survey_form_draft");
+      if (saved) {
+        try {
+          const draft = JSON.parse(saved);
+          
+          // Let's determine if the draft has any significant content to prevent restoring an empty draft
+          const hasContent = !!(draft.borrowerName || draft.nik || draft.phone || draft.address || draft.businessType || draft.moNotes || draft.photoKtp || draft.photoDebitur || (draft.slikActiveLoans && draft.slikActiveLoans.length > 0) || (draft.collaterals && draft.collaterals.length > 1));
+          
+          if (hasContent) {
+            setBorrowerName(draft.borrowerName || "");
+            setNik(draft.nik || "");
+            setPhone(draft.phone || "");
+            setAddress(draft.address || "");
+            setBusinessType(draft.businessType || "");
+            setBusinessAge(draft.businessAge ?? 3);
+            setRequestedAmount(draft.requestedAmount ?? 25000000);
+            setRequestedTenor(draft.requestedTenor ?? 12);
+            setMonthlyRevenue(draft.monthlyRevenue ?? 15000000);
+            setMonthlyExpenses(draft.monthlyExpenses ?? 9000000);
+            setCollateralType(draft.collateralType || "BPKB");
+            setCollateralDescription(draft.collateralDescription || "");
+            setCollateralValue(draft.collateralValue ?? 15000000);
+            setMoNotes(draft.moNotes || "");
+            setGpsLatitude(draft.gpsLatitude ?? -8.1132);
+            setGpsLongitude(draft.gpsLongitude ?? 111.9025);
+            setGpsAddress(draft.gpsAddress || "Kecamatan Boyolangu, Tulungagung");
+            setScheme(draft.scheme || "PJI");
+            
+            if (draft.scores) {
+              setScores(draft.scores);
+            }
+            
+            setPhotoKtp(draft.photoKtp || null);
+            setPhotoDebitur(draft.photoDebitur || null);
+
+            setPhotosRumah(draft.photosRumah || [null, null, null, null]);
+            setPhotosUsaha(draft.photosUsaha || [null, null, null, null]);
+            setPhotosStok(draft.photosStok || [null, null, null, null]);
+            setPhotosAgunan(draft.photosAgunan || [null, null, null, null]);
+
+            setSlikStatus(draft.slikStatus || "KOL-1 (LANCAR)");
+            setSectorType(draft.sectorType || "UMUM");
+            
+            if (draft.collaterals) {
+              setCollaterals(draft.collaterals);
+            }
+            if (draft.slikActiveLoans) {
+              setSlikActiveLoans(draft.slikActiveLoans);
+            }
+            
+            setSectorFishCount(draft.sectorFishCount || 0);
+            setSectorFishWeight(draft.sectorFishWeight || 0);
+            setSectorFishPrice(draft.sectorFishPrice || 0);
+            setSectorLandSize(draft.sectorLandSize || 0);
+            setSectorYield(draft.sectorYield || 0);
+            setSectorCropPrice(draft.sectorCropPrice || 0);
+            setSectorLivestockCount(draft.sectorLivestockCount || 0);
+            setSectorLivestockPrice(draft.sectorLivestockPrice || 0);
+            setSectorPayrollBaseSalary(draft.sectorPayrollBaseSalary || 0);
+            setSectorPayrollAllowances(draft.sectorPayrollAllowances || 0);
+            setSectorPayrollDeductions(draft.sectorPayrollDeductions || 0);
+
+            if (draft.photosCoords) {
+              setPhotosCoords(draft.photosCoords);
+            }
+
+            setHasDraft(true);
+            setDraftSavedAt(draft.savedAt ? new Date(draft.savedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : null);
+          } else {
+            resetToEmptyForm();
+          }
+        } catch (e) {
+          console.error("Gagal membaca draf", e);
+          resetToEmptyForm();
+        }
+      } else {
+        resetToEmptyForm();
+      }
     }
   }, [surveyToEdit]);
+
+  // Periodic Auto-save effect
+  useEffect(() => {
+    // Only save when we are NOT editing an existing survey
+    if (surveyToEdit) return;
+
+    // Detect if we actually have anything filled so we don't spam empty items
+    const hasAnyContent = !!(borrowerName || nik || phone || address || businessType || moNotes || photoKtp || photoDebitur || slikActiveLoans.length > 0 || collaterals.length > 1 || collaterals.some(c => c.description || c.value !== 15000000));
+    
+    if (!hasAnyContent) {
+      // If it became totally empty, remove the item
+      localStorage.removeItem("bpr_survey_form_draft");
+      setHasDraft(false);
+      setDraftSavedAt(null);
+      return;
+    }
+
+    const draft = {
+      borrowerName,
+      nik,
+      phone,
+      address,
+      businessType,
+      businessAge,
+      requestedAmount,
+      requestedTenor,
+      monthlyRevenue,
+      monthlyExpenses,
+      collateralType,
+      collateralDescription,
+      collateralValue,
+      moNotes,
+      gpsLatitude,
+      gpsLongitude,
+      gpsAddress,
+      scheme,
+      scores,
+      photoKtp,
+      photoDebitur,
+      photosRumah,
+      photosUsaha,
+      photosStok,
+      photosAgunan,
+      slikStatus,
+      sectorType,
+      collaterals,
+      slikActiveLoans,
+      sectorFishCount,
+      sectorFishWeight,
+      sectorFishPrice,
+      sectorLandSize,
+      sectorYield,
+      sectorCropPrice,
+      sectorLivestockCount,
+      sectorLivestockPrice,
+      sectorPayrollBaseSalary,
+      sectorPayrollAllowances,
+      sectorPayrollDeductions,
+      photosCoords,
+      savedAt: new Date().toISOString()
+    };
+
+    localStorage.setItem("bpr_survey_form_draft", JSON.stringify(draft));
+    setHasDraft(true);
+    setDraftSavedAt(new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }));
+  }, [
+    surveyToEdit,
+    borrowerName,
+    nik,
+    phone,
+    address,
+    businessType,
+    businessAge,
+    requestedAmount,
+    requestedTenor,
+    monthlyRevenue,
+    monthlyExpenses,
+    collateralType,
+    collateralDescription,
+    collateralValue,
+    moNotes,
+    gpsLatitude,
+    gpsLongitude,
+    gpsAddress,
+    scheme,
+    scores,
+    photoKtp,
+    photoDebitur,
+    photosRumah,
+    photosUsaha,
+    photosStok,
+    photosAgunan,
+    slikStatus,
+    sectorType,
+    collaterals,
+    slikActiveLoans,
+    sectorFishCount,
+    sectorFishWeight,
+    sectorFishPrice,
+    sectorLandSize,
+    sectorYield,
+    sectorCropPrice,
+    sectorLivestockCount,
+    sectorLivestockPrice,
+    sectorPayrollBaseSalary,
+    sectorPayrollAllowances,
+    sectorPayrollDeductions,
+    photosCoords
+  ]);
+
+  const handleClearDraft = () => {
+    if (confirm("Konfirmasi Hapus Draf: Apakah Anda yakin ingin menghapus draf pengisian saat ini dan memulai kembali dengan formulir kosong?")) {
+      localStorage.removeItem("bpr_survey_form_draft");
+      setHasDraft(false);
+      setDraftSavedAt(null);
+      resetToEmptyForm();
+    }
+  };
 
   const resetToEmptyForm = () => {
     setBorrowerName("");
@@ -545,6 +746,7 @@ export default function CreditSurveyForm({
         const errData = await response.json();
         setFormError(errData.error || "Gagal menyimpan pengajuan survey.");
       } else {
+        localStorage.removeItem("bpr_survey_form_draft");
         onSurveySaved();
       }
     } catch (err) {
@@ -595,6 +797,27 @@ export default function CreditSurveyForm({
           </button>
         </div>
       </div>
+
+      {hasDraft && !surveyToEdit && (
+        <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl flex items-center justify-between text-xs shadow-xs font-sans">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+            </span>
+            <span>
+              💾 <strong>Draf Pengisian Otomatis:</strong> Data formulir terakhir Anda dipulihkan otomatis (terakhir disimpan pukul {draftSavedAt || "hari ini"}).
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={handleClearDraft}
+            className="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2.5 py-1 rounded-lg border border-amber-300 transition"
+          >
+            Hapus Draf
+          </button>
+        </div>
+      )}
 
       {formError && (
         <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg text-xs font-semibold">
