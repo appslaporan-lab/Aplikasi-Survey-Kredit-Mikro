@@ -1,1 +1,58 @@
 @import "tailwindcss";
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 12mm 12mm 12mm;
+  }
+  
+  /* Basic print document resetting */
+  html, body {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+    font-size: 10pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Force print-specific element scaling or grid corrections */
+  main, .max-w-7xl {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Force grid details to span 12 columns so it fills the screen width */
+  .xl\:col-span-8 {
+    width: 100% !important;
+    max-width: 100% !important;
+    grid-column: span 12 / span 12 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #survey-printcard {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Hide interactive or layout components */
+  header, footer, nav, aside, button, form, iframe, .print\:hidden {
+    display: none !important;
+  }
+
+  /* Ensure page breaks don't occur in the middle of lists or pictures */
+  .page-break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

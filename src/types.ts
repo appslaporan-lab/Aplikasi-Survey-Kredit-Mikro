@@ -23,6 +23,8 @@ export interface CollateralItem {
   type: 'SHM' | 'BPKB' | 'LOS_PASAR' | 'SK_ASLI' | 'TANPA_AGUNAN' | 'LAINNYA';
   description: string;
   value: number;
+  vehicleAge?: number; // vehicle age in years (for BPKB)
+  taksasiValue?: number; // calculated taksasi value
 }
 
 export interface SlikActiveLoan {
@@ -54,10 +56,17 @@ export interface CreditSurvey {
   nik: string;
   phone: string;
   address: string;
+  addressDusun?: string;
+  addressDesa?: string;
+  addressRt?: string;
+  addressRw?: string;
+  addressKabupaten?: string;
   businessType: string;
   businessAge: number; // in years
   requestedAmount: number; // IDR
   requestedTenor: number; // months
+  interestRate?: number; // annual percentage flat rate, e.g. 12%
+  monthlyInstallment?: number; // calculated monthly installment IDR
   monthlyRevenue: number; // monthly turnover, IDR
   monthlyExpenses: number; // monthly costs, IDR
   netMonthlyIncome: number; // calculated, IDR
@@ -131,7 +140,7 @@ export interface CreditSurvey {
   ewsScore: number; // 1-10 index of warning level
 }
 
-export type UserRole = 'MO' | 'KASUBAG' | 'KABAG' | 'ADMIN';
+export type UserRole = 'MO' | 'KASUBAG' | 'KABAG' | 'PIMCAB' | 'ADMIN';
 
 export type UserApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 

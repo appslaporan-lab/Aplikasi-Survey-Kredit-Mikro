@@ -403,10 +403,11 @@ export default function MobileAuth({
                           <span className={`text-[8px] px-1 font-mono font-bold rounded uppercase shrink-0 ${
                             demoUsr.role === "ADMIN" ? "bg-red-100 text-red-700" :
                             demoUsr.role === "KABAG" ? "bg-purple-100 text-purple-700" :
-                            demoUsr.role === "KASUBAG" ? "bg-blue-100 text-blue-700" :
+                            demoUsr.role === "PIMCAB" ? "bg-rose-100 text-rose-700 border border-rose-200" :
+                            demoUsr.role === "KASUBAG" ? "bg-blue-100 text-blue-700 font-extrabold" :
                             "bg-emerald-100 text-emerald-700"
                           }`}>
-                            {demoUsr.role}
+                            {demoUsr.role === "KASUBAG" ? "KASUBAG / KEPALA KAS" : demoUsr.role}
                           </span>
                         </div>
                         <div className="text-[9px] text-slate-500 font-medium mt-0.5 space-x-2">
@@ -464,8 +465,8 @@ export default function MobileAuth({
                 required
                 placeholder="Contoh: Rian Hidayat"
                 value={regName}
-                onChange={(e) => setRegName(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 text-slate-700"
+                onChange={(e) => setRegName(e.target.value.toUpperCase())}
+                className="w-full text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 text-slate-700 font-mono"
               />
             </div>
 
@@ -479,8 +480,8 @@ export default function MobileAuth({
                 required
                 placeholder="rian.hidayat@banktulungagung.co.id"
                 value={regEmail}
-                onChange={(e) => setRegEmail(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 text-slate-700"
+                onChange={(e) => setRegEmail(e.target.value.toUpperCase())}
+                className="w-full text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 text-slate-700 font-mono"
               />
             </div>
 
@@ -495,7 +496,7 @@ export default function MobileAuth({
                 maxLength={16}
                 placeholder="Masukkan 16 Digit NIK Pegawai"
                 value={regNik}
-                onChange={(e) => setRegNik(e.target.value)}
+                onChange={(e) => setRegNik(e.target.value.toUpperCase())}
                 className="w-full text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 text-slate-700 font-mono"
               />
             </div>
@@ -529,8 +530,9 @@ export default function MobileAuth({
                 className="w-full text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 text-slate-700"
               >
                 <option value="MO">Marketing Officer (MO Lapangan)</option>
-                <option value="KASUBAG">KASUBAG (Supervisor Kredit)</option>
+                <option value="KASUBAG">KASUBAG / Kepala Kas (Supervisor Kredit)</option>
                 <option value="KABAG">KABAG Kredit (Pemutus Kredit)</option>
+                <option value="PIMCAB">Pimpinan Cabang (PIMCAB - Pemutus Kredit)</option>
               </select>
             </div>
 
@@ -544,8 +546,8 @@ export default function MobileAuth({
                 required
                 placeholder="Contoh: rian.hidayat"
                 value={regUsername}
-                onChange={(e) => setRegUsername(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 text-slate-700"
+                onChange={(e) => setRegUsername(e.target.value.toUpperCase())}
+                className="w-full text-xs font-semibold px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 text-slate-700 font-mono"
               />
             </div>
 

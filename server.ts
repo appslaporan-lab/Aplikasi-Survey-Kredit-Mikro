@@ -70,7 +70,7 @@ const INITIAL_USERS: FieldUser[] = [
     status: "APPROVED",
     createdAt: "2026-06-01T00:00:00Z",
     username: "alhuda",
-    password: "bank123"
+    password: "Alhuda@2026"
   },
   {
     email: "alhuda@banktulungagung.co.id",
@@ -177,7 +177,7 @@ const INITIAL_USERS: FieldUser[] = [
   {
     email: "pimpinan.campurdarat@banktulungagung.co.id",
     name: "Bambang Widjojo (Pimcab Campurdarat)",
-    role: "KABAG",
+    role: "PIMCAB",
     nik: "3504011212700001",
     officeId: "cab-campurdarat",
     status: "APPROVED",
@@ -621,6 +621,10 @@ app.get("/api/users", async (req, res) => {
         u.password = "bank123";
         changed = true;
       }
+      if (u.username === "alhuda" && u.password !== "Alhuda@2026") {
+        u.password = "Alhuda@2026";
+        changed = true;
+      }
       if (changed) {
         // Asynchronously update in firestore to persist compatibility fields
         setDoc(doc.ref, u).catch(err => console.error("Gagal migrasi data user:", err));
@@ -708,7 +712,8 @@ app.post("/api/register", async (req, res) => {
     res.status(201).json({ success: true, user: newUser });
   } catch (error) {
     console.error("Firestore error on user register:", error);
-    res.status(500).json({ error: "Gagal melakukan registrasi" });
+    const details = error instanceof Error ? error.message : String(error);
+    res.status(500).json({ error: `Gagal melakukan registrasi: ${details}` });
   }
 });
 
@@ -738,6 +743,134 @@ app.post("/api/reset-data", async (req, res) => {
     console.error("Firestore error on database reset:", error);
     res.status(500).json({ error: "Gagal mengosongkan database" });
   }
+});
+
+// Automated 5C Scoring & Opinion Analysis (Gemini API with Smart Failure Fallback)
+app.post("/api/analyze-5c", async (req, res) => {
+  const { qCharacter = "", qCapacity = "", qCapital = "", qCollateral = "", qCondition = "", scheme = "PJI" } = req.body;
+
+  let finalResult = {
+    scores: { character: 75, capacity: 75, capital: 70, collateral: 70, condition: 75 },
+    opinions: {
+      character: "Karakter debitur dinilai cukup baik berdasarkan catatan kualitatif.",
+      capacity: "Kapasitas pembayaran dinilai memadai.",
+      capital: "Permodalan dinilai standar untuk skala mikro.",
+      collateral: "Agunan yang ditawarkan dinilai dalam batas aman risiko.",
+      condition: "Kondisi ekonomi wilayah Tulungagung diproyeksikan stabil."
+    },
+    overallOpinion: "Berdasarkan penilaian awal, calon debitur memenuhi kriteria kelayakan kredit mikro dengan tingkat risiko terkendali."
+  };
+
+  const getRuleScore = (text: string, defaultScore: number, positiveKeywords: string[], negativeKeywords: string[]) => {
+    const lower = text.toLowerCase();
+    for (const kw of negativeKeywords) {
+      if (lower.includes(kw)) return 55;
+    }
+    for (const kw of positiveKeywords) {
+      if (lower.includes(kw)) return 85;
+    }
+    return defaultScore;
+  };
+
+  // Run local fallback rules
+  const cScore = getRuleScore(qCharacter, 75, ["lancar", "baik", "aman", "kooperatif", "sesuai", "patuh", "aktif"], ["macet", "buruk", "telat", "lambat", "masalah", "tunggak", "blacklist"]);
+  const capScore = getRuleScore(qCapacity, 75, ["sisa", "untung", "besar", "omset", "mampu", "cukup", "lancar"], ["sepi", "rugi", "turun", "kurang", "lemah", "beban", "pasif"]);
+  const cap2Score = getRuleScore(qCapital, 70, ["kuat", "modal", "sendiri", "aset", "tanah", "punya"], ["hutang", "kecil", "pinjam", "minim", "habis", "bekas"]);
+  const colScore = getRuleScore(qCollateral, 70, ["shm", "sertifikat", "bpkb", "aman", "cukup", "tinggi", "bagus"], ["tanpa", "tidak ada", "kurang", "kosong", "susah", "lemah"]);
+  const condScore = getRuleScore(qCondition, 75, ["stabil", "ramai", "prospek", "naik", "potensi", "bagus"], ["lesu", "krisis", "musim", "hujan", "menurun", "rawan"]);
+
+  finalResult.scores = {
+    character: cScore,
+    capacity: capScore,
+    capital: cap2Score,
+    collateral: colScore,
+    condition: condScore
+  };
+
+  if (ai) {
+    try {
+      console.log("Calling Gemini API to score kualitatif 5C dynamically...");
+      const systemPrompt = `Anda adalah Credit Analyst BPR Bank Tulungagung Perseroda. Analisis data analisis kualitatif 5C calon debitur di Tulungagung dan berikan skor numerik (0-100) serta opini per kriteria dan keseluruhan opini secara formal, realistis, dan berpegang pada asas kehati-hatian perbankan (Prudential Banking).`;
+      
+      const prompt = `Evaluasi 5 kriteria 5C berdasarkan analisis kualitatif lapangan:
+1. Character: "${qCharacter}"
+2. Capacity: "${qCapacity}"
+3. Capital: "${qCapital}"
+4. Collateral: "${qCollateral}"
+5. Condition: "${qCondition}"
+Skema pengajuan: Sektor ${scheme === "PPP" ? "Pertanian / Perikanan / Peternakan" : scheme === "PAYROLL" ? "Payroll Pegawai" : "Perdagangan / Jasa Komersil"}.
+
+Berikan respon JSON terstruktur:
+{
+  "scores": {
+    "character": integer,
+    "capacity": integer,
+    "capital": integer,
+    "collateral": integer,
+    "condition": integer
+  },
+  "opinions": {
+    "character": "Penjelasan singkat kualitiatif karakter nasabah",
+    "capacity": "Penjelasan kapasitas produktifitas keuangan mendatar",
+    "capital": "Analisa kontribusi ekuitas mandiri dalam usaha",
+    "collateral": "Dukungan rasio agunan fisik debitur",
+    "condition": "Faktor luar tulungagung dan ketahanan persaingan"
+  },
+  "overallOpinion": "Ringkasan opini analisis akhir rekomendasi perbankan"
+}`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt,
+        config: {
+          systemInstruction: systemPrompt,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              scores: {
+                type: Type.OBJECT,
+                properties: {
+                  character: { type: Type.INTEGER },
+                  capacity: { type: Type.INTEGER },
+                  capital: { type: Type.INTEGER },
+                  collateral: { type: Type.INTEGER },
+                  condition: { type: Type.INTEGER }
+                },
+                required: ["character", "capacity", "capital", "collateral", "condition"]
+              },
+              opinions: {
+                type: Type.OBJECT,
+                properties: {
+                  character: { type: Type.STRING },
+                  capacity: { type: Type.STRING },
+                  capital: { type: Type.STRING },
+                  collateral: { type: Type.STRING },
+                  condition: { type: Type.STRING }
+                },
+                required: ["character", "capacity", "capital", "collateral", "condition"]
+              },
+              overallOpinion: { type: Type.STRING }
+            },
+            required: ["scores", "opinions", "overallOpinion"]
+          }
+        }
+      });
+
+      const responseText = response.text;
+      if (responseText) {
+        const parsed = JSON.parse(responseText.trim());
+        if (parsed.scores && parsed.opinions && parsed.overallOpinion) {
+          finalResult = parsed;
+          console.log("Successfully extracted AI 5C score & opinions.");
+        }
+      }
+    } catch (err) {
+      console.warn("Error running Gemini 5C AI matrix, using rule-based scoring fallback instead.", err);
+    }
+  }
+
+  res.json(finalResult);
 });
 
 // -------------------------------------------------------------

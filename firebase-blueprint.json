@@ -7,7 +7,7 @@
       "properties": {
         "email": { "type": "string", "description": "Email identifier" },
         "name": { "type": "string", "description": "Full name of the user" },
-        "role": { "type": "string", "enum": ["ADMIN", "MO", "KASUBAG", "KABAG"], "description": "Role type" },
+        "role": { "type": "string", "enum": ["ADMIN", "MO", "KASUBAG", "KABAG", "PIMCAB"], "description": "Role type" },
         "nik": { "type": "string", "description": "NIK number" },
         "officeId": { "type": "string", "description": "Office identifier" },
         "status": { "type": "string", "enum": ["APPROVED", "PENDING", "REJECTED"], "description": "Approval status" },

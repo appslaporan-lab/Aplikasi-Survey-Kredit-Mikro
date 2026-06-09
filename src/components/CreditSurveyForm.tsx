@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from "react";
 import { CreditSurvey, Scoring5C, SurveyScheme, UserSession, CollateralItem, SlikActiveLoan } from "../types";
-import { Navigation, Camera, Save, MapPin, CheckSquare, Layers, Image, Info } from "lucide-react";
+import { Navigation, Camera, Save, MapPin, CheckSquare, Layers, Image, Info, Sparkles } from "lucide-react";
 
 interface CreditSurveyFormProps {
   currentSession: UserSession;
@@ -33,6 +33,12 @@ export default function CreditSurveyForm({
   const [nik, setNik] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [addressDusun, setAddressDusun] = useState("");
+  const [addressDesa, setAddressDesa] = useState("");
+  const [addressRt, setAddressRt] = useState("");
+  const [addressRw, setAddressRw] = useState("");
+  const [addressKabupaten, setAddressKabupaten] = useState("");
+  const [interestRate, setInterestRate] = useState<number>(12);
   const [businessType, setBusinessType] = useState("");
   const [businessAge, setBusinessAge] = useState<number>(3);
   const [requestedAmount, setRequestedAmount] = useState<number>(25000000);
@@ -129,13 +135,84 @@ export default function CreditSurveyForm({
     agunan: [null, null, null, null]
   });
 
+  // Helper parsing address for backwards compatibility or split components
+  const parseAddress = (fullAddr: string) => {
+    const emptyObj = { dusun: "", desa: "", rt: "", rw: "", kab: "TULUNGAGUNG" };
+    if (!fullAddr) return emptyObj;
+    
+    // Check if it matches our combined format
+    const matchDusun = fullAddr.match(/Dusun\/Jalan:\s*([^,]*)/i) || fullAddr.match(/Dusun:\s*([^,]*)/i);
+    const matchDesa = fullAddr.match(/Desa\/Kota:\s*([^,]*)/i) || fullAddr.match(/Desa:\s*([^,]*)/i);
+    const matchRt = fullAddr.match(/RT:\s*([^,]*)/i);
+    const matchRw = fullAddr.match(/RW:\s*([^,]*)/i);
+    const matchKab = fullAddr.match(/Kabupaten\/Kota:\s*([^,]*)/i) || fullAddr.match(/Kab\/Kota:\s*([^,]*)/i) || fullAddr.match(/Kabupaten:\s*([^,]*)/i);
+    
+    if (matchDusun || matchDesa || matchRt || matchRw || matchKab) {
+      return {
+        dusun: matchDusun ? matchDusun[1].trim() : "",
+        desa: matchDesa ? matchDesa[1].trim() : "",
+        rt: matchRt ? matchRt[1].trim() : "",
+        rw: matchRw ? matchRw[1].trim() : "",
+        kab: matchKab ? matchKab[1].trim() : "TULUNGAGUNG"
+      };
+    }
+    
+    return {
+      dusun: fullAddr,
+      desa: "",
+      rt: "",
+      rw: "",
+      kab: "TULUNGAGUNG"
+    };
+  };
+
+  // Listen to address components changing to compile standard 'address' string
+  useEffect(() => {
+    if (addressDusun || addressDesa || addressRt || addressRw || addressKabupaten) {
+      const combined = `Dusun/Jalan: ${addressDusun}, Desa/Kota: ${addressDesa}, RT: ${addressRt}, RW: ${addressRw}, Kabupaten/Kota: ${addressKabupaten}`;
+      setAddress(combined);
+    }
+  }, [addressDusun, addressDesa, addressRt, addressRw, addressKabupaten]);
+
+  const calculateColTaksasi = (type: string, value: number, age?: number): number => {
+    if (type === "SHM") {
+      return Math.round(value * 1.5);
+    } else if (type === "BPKB") {
+      const vehicleAge = age ?? 1;
+      if (vehicleAge <= 1) {
+        return Math.round(value * 0.7);
+      } else {
+        return Math.round(value * 0.6);
+      }
+    }
+    return value; // default 100%
+  };
+
+  const getColTaksasiLabel = (type: string, age?: number): string => {
+    if (type === "SHM") return "Sertifikat (150% nilai pasar)";
+    if (type === "BPKB") {
+      const vehicleAge = age ?? 1;
+      return vehicleAge <= 1 ? "BPKB ≤ 1 Thn (70% nilai pasar)" : "BPKB > 1 Thn (60% nilai pasar)";
+    }
+    return "Umum (100% nilai pasar)";
+  };
+
   // Load defaults or restore draft if edit mode / create mode
   useEffect(() => {
     if (surveyToEdit) {
       setBorrowerName(surveyToEdit.borrowerName);
       setNik(surveyToEdit.nik);
       setPhone(surveyToEdit.phone);
-      setAddress(surveyToEdit.address);
+      
+      const parsedAddr = parseAddress(surveyToEdit.address || "");
+      setAddressDusun(surveyToEdit.addressDusun || parsedAddr.dusun);
+      setAddressDesa(surveyToEdit.addressDesa || parsedAddr.desa);
+      setAddressRt(surveyToEdit.addressRt || parsedAddr.rt);
+      setAddressRw(surveyToEdit.addressRw || parsedAddr.rw);
+      setAddressKabupaten(surveyToEdit.addressKabupaten || parsedAddr.kab);
+      setAddress(surveyToEdit.address || "");
+      setInterestRate(surveyToEdit.interestRate ?? 12);
+
       setBusinessType(surveyToEdit.businessType);
       setBusinessAge(surveyToEdit.businessAge);
       setRequestedAmount(surveyToEdit.requestedAmount);
@@ -229,7 +306,16 @@ export default function CreditSurveyForm({
             setBorrowerName(draft.borrowerName || "");
             setNik(draft.nik || "");
             setPhone(draft.phone || "");
+            
+            const parsedDraftAddr = parseAddress(draft.address || "");
+            setAddressDusun(draft.addressDusun || parsedDraftAddr.dusun);
+            setAddressDesa(draft.addressDesa || parsedDraftAddr.desa);
+            setAddressRt(draft.addressRt || parsedDraftAddr.rt);
+            setAddressRw(draft.addressRw || parsedDraftAddr.rw);
+            setAddressKabupaten(draft.addressKabupaten || parsedDraftAddr.kab);
             setAddress(draft.address || "");
+            setInterestRate(draft.interestRate ?? 12);
+
             setBusinessType(draft.businessType || "");
             setBusinessAge(draft.businessAge ?? 3);
             setRequestedAmount(draft.requestedAmount ?? 25000000);
@@ -319,6 +405,12 @@ export default function CreditSurveyForm({
       nik,
       phone,
       address,
+      addressDusun,
+      addressDesa,
+      addressRt,
+      addressRw,
+      addressKabupaten,
+      interestRate,
       businessType,
       businessAge,
       requestedAmount,
@@ -521,6 +613,54 @@ export default function CreditSurveyForm({
     );
   };
 
+  // Helper to compress base64 images using HTML Canvas before storing
+  const compressImage = (base64Str: string, maxWidth = 720, maxHeight = 720, quality = 0.60): Promise<string> => {
+    return new Promise((resolve) => {
+      if (!base64Str || !base64Str.startsWith("data:image")) {
+        resolve(base64Str);
+        return;
+      }
+
+      const img = new window.Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        // Maintain aspect ratio
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(base64Str);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        // Compress as JPEG to keep the bytes minimal
+        const compressed = canvas.toDataURL("image/jpeg", quality);
+        resolve(compressed);
+      };
+      img.onerror = () => {
+        resolve(base64Str);
+      };
+      img.src = base64Str;
+    });
+  };
+
   // Convert files to base64 beautifully & capture GPS coordinates for each photo
   const handlePhotoUploadAt = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -530,8 +670,11 @@ export default function CreditSurveyForm({
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
+      reader.onloadend = async () => {
+        const rawBase64 = reader.result as string;
+        // Compress image immediately so that everything in state remains lightweight
+        const base64 = await compressImage(rawBase64);
+
         if (field === "rumah") {
           setPhotosRumah(prev => {
             const copy = [...prev];
@@ -606,8 +749,9 @@ export default function CreditSurveyForm({
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
+      reader.onloadend = async () => {
+        const rawBase64 = reader.result as string;
+        const base64 = await compressImage(rawBase64);
         if (type === "ktp") setPhotoKtp(base64);
         if (type === "debitur") setPhotoDebitur(base64);
       };
@@ -690,6 +834,13 @@ export default function CreditSurveyForm({
       nik,
       phone,
       address,
+      addressDusun,
+      addressDesa,
+      addressRt,
+      addressRw,
+      addressKabupaten,
+      interestRate: Number(interestRate),
+      monthlyInstallment: Math.round((requestedAmount / (requestedTenor || 12)) + (requestedAmount * ((interestRate || 0) / 100)) / 12),
       businessType,
       businessAge: Number(businessAge),
       requestedAmount: Number(requestedAmount),
@@ -699,7 +850,11 @@ export default function CreditSurveyForm({
       collateralType: firstCol.type as any,
       collateralDescription: firstCol.description,
       collateralValue: Number(firstCol.value),
-      collaterals,
+      collaterals: collaterals.map(col => ({
+        ...col,
+        taksasiValue: calculateColTaksasi(col.type, col.value, col.vehicleAge),
+        vehicleAge: col.type === "BPKB" ? (col.vehicleAge ?? 1) : undefined
+      })),
       slikActiveLoans,
       moNotes,
       gpsLatitude,
@@ -769,6 +924,54 @@ export default function CreditSurveyForm({
       [attribute]: text
     }));
   };
+
+  const [isAi5cLoading, setIsAi5cLoading] = useState(false);
+
+  const runAi5cAnalysis = async () => {
+    setIsAi5cLoading(true);
+    try {
+      const resp = await fetch("/api/analyze-5c", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          qCharacter: scores.qCharacter,
+          qCapacity: scores.qCapacity,
+          qCapital: scores.qCapital,
+          qCollateral: scores.qCollateral,
+          qCondition: scores.qCondition,
+          scheme
+        })
+      });
+      if (resp.ok) {
+        const result = await resp.json();
+        setScores(prev => ({
+          ...prev,
+          character: result.scores.character,
+          capacity: result.scores.capacity,
+          capital: result.scores.capital,
+          collateral: result.scores.collateral,
+          condition: result.scores.condition,
+          qCharacter: prev.qCharacter || result.opinions.character,
+          qCapacity: prev.qCapacity || result.opinions.capacity,
+          qCapital: prev.qCapital || result.opinions.capital,
+          qCollateral: prev.qCollateral || result.opinions.collateral,
+          qCondition: prev.qCondition || result.opinions.condition,
+        }));
+        
+        if (!moNotes) {
+          setMoNotes(`[ANALISA OPINI OTOMATIS AI 5C]: ${result.overallOpinion}`);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch 5C analysis from API", e);
+    } finally {
+      setIsAi5cLoading(false);
+    }
+  };
+
+  const calculatedInstallment = Math.round(
+    (requestedAmount / (requestedTenor || 12)) + (requestedAmount * ((interestRate || 0) / 100)) / 12
+  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -872,16 +1075,69 @@ export default function CreditSurveyForm({
                 />
               </div>
 
-              <div className="col-span-2">
-                <label className="block text-[10px] font-bold text-slate-505 uppercase tracking-wider mb-1">Alamat Domisili Lengkap</label>
-                <textarea
-                  rows={2}
-                  required
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full text-xs border border-slate-200 rounded px-2.5 py-1.5 bg-slate-55"
-                  placeholder="Nama jalan, RT/RW, Kecamatan..."
-                />
+              <div className="col-span-2 mt-1">
+                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Detail Alamat Domisili</span>
+                <div className="grid grid-cols-2 gap-3 border border-slate-100 rounded-lg p-3 bg-slate-50/20">
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Dusun / Jalan</label>
+                    <input
+                      type="text"
+                      required
+                      value={addressDusun}
+                      onChange={(e) => setAddressDusun(e.target.value.toUpperCase())}
+                      className="w-full text-xs border border-slate-200 rounded px-2.5 py-1.5 bg-slate-55 uppercase font-mono"
+                      placeholder="CONTOH: DUSUN GANG UTAMA RT 01"
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Desa / Kecamatan / Kota</label>
+                    <input
+                      type="text"
+                      required
+                      value={addressDesa}
+                      onChange={(e) => setAddressDesa(e.target.value.toUpperCase())}
+                      className="w-full text-xs border border-slate-200 rounded px-2.5 py-1.5 bg-slate-55 uppercase font-mono"
+                      placeholder="CONTOH: KETAWANG, BOYOLANGU"
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kabupaten / Provinsi</label>
+                    <input
+                      type="text"
+                      required
+                      value={addressKabupaten}
+                      onChange={(e) => setAddressKabupaten(e.target.value.toUpperCase())}
+                      className="w-full text-xs border border-slate-200 rounded px-2.5 py-1.5 bg-slate-55 uppercase font-mono"
+                      placeholder="CONTOH: TULUNGAGUNG"
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">RT</label>
+                    <input
+                      type="text"
+                      required
+                      value={addressRt}
+                      onChange={(e) => setAddressRt(e.target.value.toUpperCase())}
+                      className="w-full text-xs border border-slate-200 rounded px-2.5 py-1.5 bg-slate-55 font-mono"
+                      placeholder="CONTOH: 002"
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">RW</label>
+                    <input
+                      type="text"
+                      required
+                      value={addressRw}
+                      onChange={(e) => setAddressRw(e.target.value.toUpperCase())}
+                      className="w-full text-xs border border-slate-200 rounded px-2.5 py-1.5 bg-slate-55 font-mono"
+                      placeholder="CONTOH: 005"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* LAMPIRAN BERKAS UTAMA: FOTO KTP & FOTO CALON DEBITUR */}
@@ -1388,6 +1644,26 @@ export default function CreditSurveyForm({
               </div>
 
               <div>
+                <label className="block text-[10px] font-bold text-slate-505 uppercase tracking-wider mb-1">Suku Bunga (% Flat p.a.)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  required
+                  value={interestRate}
+                  onChange={(e) => setInterestRate(Number(e.target.value) || 0)}
+                  className="w-full text-xs font-bold border border-slate-200 rounded px-2.5 py-1.5 bg-slate-55 text-rose-700"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Estimasi Angsuran Bulanan (P+B)</label>
+                <div className="w-full text-xs font-mono font-bold border border-slate-200 rounded px-2.5 py-1.5 bg-amber-50 text-indigo-900 flex justify-between items-center h-[34px]">
+                  <span>Rp {calculatedInstallment.toLocaleString("id-ID")}</span>
+                  <span className="text-[9px] text-indigo-500 font-sans tracking-wide">FLAT RATE</span>
+                </div>
+              </div>
+
+              <div>
                 <label className="block text-[10px] font-bold text-slate-505 uppercase tracking-wider mb-1">Omzet/Pendapatan Bulanan (Rp)</label>
                 <input
                   type="number"
@@ -1511,6 +1787,37 @@ export default function CreditSurveyForm({
                         placeholder="Masukkan nomor SHM/BPKB, atas nama siapa, masa berlaku SK, dll."
                       />
                     </div>
+
+                    {col.type === "BPKB" && (
+                      <div className="col-span-1">
+                        <label className="block text-[9px] font-bold text-slate-500 uppercase mb-0.5">Usia Kendaraan (Tahun)</label>
+                        <input
+                          type="number"
+                          value={col.vehicleAge ?? 1}
+                          onChange={(e) => {
+                            const updated = [...collaterals];
+                            updated[idx].vehicleAge = Number(e.target.value) || 0;
+                            updated[idx].taksasiValue = calculateColTaksasi("BPKB", col.value, Number(e.target.value) || 0);
+                            setCollaterals(updated);
+                          }}
+                          className="w-full text-xs border border-slate-200 rounded px-2 py-1.5 bg-white font-semibold text-rose-800"
+                          min={0}
+                          placeholder="Contoh: 2"
+                        />
+                      </div>
+                    )}
+
+                    <div className={col.type === "BPKB" ? "col-span-1" : "col-span-2"}>
+                      <label className="block text-[9px] font-bold text-slate-500 uppercase mb-0.5">
+                        Nilai Taksasi Agunan (Hasil Formulir)
+                      </label>
+                      <div className="w-full text-xs font-mono font-bold border border-slate-200 rounded px-2.5 py-1.5 bg-yellow-50 text-indigo-900 flex justify-between items-center h-[34px]">
+                        <span>Rp {calculateColTaksasi(col.type, col.value, col.vehicleAge).toLocaleString("id-ID")}</span>
+                        <span className="text-[8px] bg-indigo-100 text-indigo-750 px-1.5 py-0.5 rounded font-sans tracking-tight">
+                          {getColTaksasiLabel(col.type, col.vehicleAge)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1618,6 +1925,36 @@ export default function CreditSurveyForm({
                   ? "Sektor Perdagangan/Jasa/Industri: Fokus utama pada kecepatan turnover kas, reputasi supplier, dan likuiditas jaminan."
                   : "Sektor Pertanian/Peternakan/Perikanan: Fokus pada kerentanan irigasi, siklus panen musiman, fluktuasi harga komoditas."}
               </p>
+            </div>
+
+            <div className="bg-gradient-to-r from-violet-500 to-indigo-600 rounded-lg p-3.5 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-sm">
+              <div className="space-y-0.5">
+                <span className="font-bold text-[11px] uppercase tracking-wider flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" /> Analisis Skor &amp; Opini 5C Otomatis
+                </span>
+                <p className="text-[10px] text-indigo-100">Ketik rincian kualitatif di bawah, lalu klik tombol ini untuk memetakan nilai &amp; opini secara otomatis via AI</p>
+              </div>
+              <button
+                type="button"
+                disabled={isAi5cLoading}
+                onClick={runAi5cAnalysis}
+                className="bg-white hover:bg-slate-50 text-indigo-700 disabled:opacity-75 transition px-3.5 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider shrink-0 flex items-center gap-1.5 shadow-sm cursor-pointer"
+              >
+                {isAi5cLoading ? (
+                  <>
+                    <svg className="animate-spin h-3 w-3 text-indigo-700" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    Memproses...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 fill-indigo-200" />
+                    Analisa Skor AI
+                  </>
+                )}
+              </button>
             </div>
 
             {/* 5C SLIDERS & CUSTOM CHECK LISTS */}

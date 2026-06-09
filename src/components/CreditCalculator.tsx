@@ -95,6 +95,52 @@ export default function CreditCalculator() {
   const totalInterest = schedule.reduce((sum, row) => sum + row.interestPaid, 0);
   const totalPayments = plafon + totalInterest;
 
+  const getSimulatedStatsForTenor = (targetTenor: number) => {
+    const interestMonthlyRate = (bungaAnualRate / 100) / 12;
+    let totalInt = 0;
+    let avgInstallment = 0;
+    
+    if (paymentType === "BULANAN") {
+      const monthlyPayment = interestMonthlyRate > 0
+        ? (plafon * interestMonthlyRate * Math.pow(1 + interestMonthlyRate, targetTenor)) / (Math.pow(1 + interestMonthlyRate, targetTenor) - 1)
+        : plafon / targetTenor;
+      
+      let currentBalance = plafon;
+      for (let m = 1; m <= targetTenor; m++) {
+        const interest = currentBalance * interestMonthlyRate;
+        const principalPaid = m === targetTenor ? currentBalance : (monthlyPayment - interest);
+        totalInt += interest;
+        currentBalance = Math.max(0, currentBalance - principalPaid);
+      }
+      avgInstallment = Math.round(monthlyPayment);
+    } else {
+      // Seasonal/Harvest
+      const numberOfHarvests = Math.floor(targetTenor / seasonalPeriod);
+      const harvestPrincipal = numberOfHarvests > 0 ? plafon / numberOfHarvests : plafon;
+      let currentBalance = plafon;
+      let totalPay = 0;
+      
+      for (let m = 1; m <= targetTenor; m++) {
+        const isHarvestMonth = m % seasonalPeriod === 0 || m === targetTenor;
+        const interest = currentBalance * interestMonthlyRate;
+        const principalPaid = isHarvestMonth ? (m === targetTenor ? currentBalance : harvestPrincipal) : 0;
+        totalInt += interest;
+        totalPay += (principalPaid + interest);
+        currentBalance = Math.max(0, currentBalance - principalPaid);
+      }
+      avgInstallment = Math.round(totalPay / targetTenor);
+    }
+    
+    const sumTotal = plafon + totalInt;
+    return {
+      monthlyInstallment: avgInstallment,
+      totalInterest: Math.round(totalInt),
+      totalPayment: sumTotal,
+      pctPrincipal: sumTotal > 0 ? Math.round((plafon / sumTotal) * 100) : 100,
+      pctInterest: sumTotal > 0 ? Math.round((totalInt / sumTotal) * 100) : 0
+    };
+  };
+
   const exportCSV = () => {
     let csv = "Bulan,Outstanding Awal (Rp),Bayar Pokok (Rp),Bayar Bunga (Rp),Total Angsuran (Rp),Sisa Pokok (Rp),Keterangan\n";
     schedule.forEach((row) => {
@@ -290,6 +336,88 @@ export default function CreditCalculator() {
               </table>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Visual Tenor Comparison section */}
+      <div className="border-t border-slate-100 pt-5 mt-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3.5">
+          <div>
+            <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+              <span className="p-1 rounded bg-indigo-50 text-indigo-600">📊</span>
+              Matriks Perbandingan Tenor Alternatif
+            </h3>
+            <p className="text-[11px] text-slate-500 font-medium">Bandingkan beban angsuran bulanan &amp; total akumulasi bunga berdasarkan opsi tenor</p>
+          </div>
+          <div className="flex gap-4 text-[10px] items-center text-slate-500 font-semibold shrink-0">
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-emerald-500 rounded-xs inline-block"></span> Pokok Pinjaman</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-violet-600 rounded-xs inline-block"></span> Total Bunga</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {[6, 12, 18, 24, 36, 48].map((optTenor) => {
+            const stats = getSimulatedStatsForTenor(optTenor);
+            const isActive = tenor === optTenor;
+            return (
+              <button
+                type="button"
+                key={optTenor}
+                onClick={() => setTenor(optTenor)}
+                className={`text-left p-3 rounded-xl border transition-all hover:scale-[1.02] flex flex-col justify-between h-40 group cursor-pointer ${
+                  isActive
+                    ? "border-indigo-500 bg-indigo-50/20 ring-1 ring-indigo-500 shadow-sm"
+                    : "border-slate-200 bg-white hover:border-slate-350 hover:shadow-xs"
+                }`}
+              >
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[11px] font-extrabold text-slate-750">{optTenor} Bulan</span>
+                    {isActive ? (
+                      <span className="text-[8px] bg-indigo-600 text-white font-bold px-1.5 py-0.5 rounded-full tracking-tighter uppercase shrink-0">Pilihan</span>
+                    ) : (
+                      <span className="text-[8px] text-slate-400 font-bold group-hover:text-indigo-600 shrink-0 transition-colors">Pilih</span>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-0.5 animate-fade-in">
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Est. Angsuran</span>
+                    <span className={`text-xs font-extrabold font-mono tracking-tight block ${isActive ? "text-indigo-700 font-black md:text-sm" : "text-slate-850"}`}>
+                      Rp {stats.monthlyInstallment.toLocaleString("id-ID")}
+                    </span>
+                    <span className="text-[9px] text-slate-400 font-medium font-sans">/ bulan</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 w-full">
+                  {/* Compound Bar Chart */}
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex">
+                    <div 
+                      className="bg-emerald-500 transition-all duration-300" 
+                      style={{ width: `${stats.pctPrincipal}%` }}
+                      title={`Pokok: ${stats.pctPrincipal}%`}
+                    />
+                    <div 
+                      className="bg-violet-600 transition-all duration-300" 
+                      style={{ width: `${stats.pctInterest}%` }}
+                      title={`Bunga: ${stats.pctInterest}%`}
+                    />
+                  </div>
+
+                  <div className="text-[9px] space-y-0.5 leading-none">
+                    <div className="flex justify-between text-slate-500 font-medium">
+                      <span>Bunga:</span>
+                      <span className="font-mono text-violet-700 font-bold">Rp {stats.totalInterest.toLocaleString("id-ID")}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-400 font-semibold border-t border-slate-100 pt-1 mt-1 text-[8px]">
+                      <span>Total Bayar:</span>
+                      <span className="font-mono text-slate-600">Rp {stats.totalPayment.toLocaleString("id-ID")}</span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

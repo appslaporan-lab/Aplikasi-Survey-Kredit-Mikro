@@ -49,6 +49,8 @@ export default function UserApprovalManager({
   const [regNik, setRegNik] = useState("");
   const [regRole, setRegRole] = useState<UserRole>("MO");
   const [regOfficeId, setRegOfficeId] = useState("kp1-kauman");
+  const [regUsername, setRegUsername] = useState("");
+  const [regPassword, setRegPassword] = useState("");
   const [regMessage, setRegMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Login picker
@@ -58,7 +60,7 @@ export default function UserApprovalManager({
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegMessage(null);
-    if (!regName || !regEmail || !regNik || !regOfficeId) {
+    if (!regName || !regEmail || !regNik || !regOfficeId || !regUsername || !regPassword) {
       setRegMessage({ type: "error", text: "Seluruh kolom wajib diisi lengkap!" });
       return;
     }
@@ -72,7 +74,9 @@ export default function UserApprovalManager({
           name: regName,
           role: regRole,
           nik: regNik,
-          officeId: regOfficeId
+          officeId: regOfficeId,
+          username: regUsername.trim(),
+          password: regPassword
         })
       });
 
@@ -88,6 +92,8 @@ export default function UserApprovalManager({
         setRegName("");
         setRegEmail("");
         setRegNik("");
+        setRegUsername("");
+        setRegPassword("");
         onRefreshUsers();
       }
     } catch (err) {
@@ -221,7 +227,7 @@ export default function UserApprovalManager({
                           )}
                         </div>
                         <div className="text-[10px] text-slate-400 font-mono italic">
-                          {usr.role} • {getOfficeName(usr.officeId)}
+                          {usr.role === "KASUBAG" ? "KASUBAG / KEPALA KAS" : usr.role} • {getOfficeName(usr.officeId)}
                         </div>
                       </div>
                       <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
@@ -247,7 +253,7 @@ export default function UserApprovalManager({
                       <div className="grid grid-cols-2 gap-2 pt-2 text-[10px] text-slate-600 border-t border-slate-200/50">
                         <div>
                           <span className="block text-slate-400 font-bold uppercase tracking-widest text-[9px]">Jabatan / Role:</span>
-                          <span className="bg-indigo-100 text-indigo-800 rounded px-1.5 py-0.5 font-bold">{currentSession.role}</span>
+                          <span className="bg-indigo-100 text-indigo-800 rounded px-1.5 py-0.5 font-bold">{currentSession.role === "KASUBAG" ? "KASUBAG / KEPALA KAS" : currentSession.role}</span>
                         </div>
                         <div>
                           <span className="block text-slate-400 font-bold uppercase tracking-widest text-[9px]">NIK Pegawai:</span>
@@ -289,9 +295,9 @@ export default function UserApprovalManager({
                   type="text"
                   required
                   value={regName}
-                  onChange={(e) => setRegName(e.target.value)}
-                  className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:ring-1 focus:ring-indigo-500"
-                  placeholder="Contoh: Rian Hidayat"
+                  onChange={(e) => setRegName(e.target.value.toUpperCase())}
+                  className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:ring-1 focus:ring-indigo-500 font-mono"
+                  placeholder="Contoh: RIAN HIDAYAT"
                 />
               </div>
 
@@ -301,9 +307,9 @@ export default function UserApprovalManager({
                   type="email"
                   required
                   value={regEmail}
-                  onChange={(e) => setRegEmail(e.target.value)}
-                  className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:ring-1 focus:ring-indigo-500"
-                  placeholder="rian.hidayat@banktulungagung.co.id"
+                  onChange={(e) => setRegEmail(e.target.value.toUpperCase())}
+                  className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:ring-1 focus:ring-indigo-500 font-mono"
+                  placeholder="RIAN.HIDAYAT@BANKTULUNGAGUNG.CO.ID"
                 />
               </div>
 
@@ -314,8 +320,8 @@ export default function UserApprovalManager({
                   required
                   maxLength={16}
                   value={regNik}
-                  onChange={(e) => setRegNik(e.target.value)}
-                  className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:ring-1 focus:ring-indigo-500"
+                  onChange={(e) => setRegNik(e.target.value.toUpperCase())}
+                  className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:ring-1 focus:ring-indigo-500 font-mono"
                   placeholder="35041512XXXXXXXX"
                 />
               </div>
@@ -343,9 +349,34 @@ export default function UserApprovalManager({
                   className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:ring-1 focus:ring-indigo-500"
                 >
                   <option value="MO">Marketing Officer (MO - Survey Lapangan)</option>
-                  <option value="KASUBAG">KASUBAG (Supervisor Reviewer Kredit)</option>
-                  <option value="KABAG">KABAG Kredit / Pemimpin Cabang (Pemutus Kredit)</option>
+                  <option value="KASUBAG">KASUBAG / Kepala Kas (Supervisor Reviewer Kredit)</option>
+                  <option value="KABAG">KABAG Kredit / Pemutus Utama (Pemutus Kredit)</option>
+                  <option value="PIMCAB">Pimpinan Cabang (PIMCAB - Pemutus Kredit)</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Username Pegawai (Untuk Login)</label>
+                <input
+                  type="text"
+                  required
+                  value={regUsername}
+                  onChange={(e) => setRegUsername(e.target.value.toUpperCase())}
+                  className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:ring-1 focus:ring-indigo-500 font-mono"
+                  placeholder="Contoh: RIAN.HIDAYAT"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Kata Sandi (Min. 6 Karakter)</label>
+                <input
+                  type="password"
+                  required
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                  className="w-full text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:ring-1 focus:ring-indigo-500"
+                  placeholder="Buat sandi baru akun Anda"
+                />
               </div>
             </div>
 
@@ -406,7 +437,7 @@ export default function UserApprovalManager({
                         </td>
                         <td className="p-3">
                           <span className="bg-slate-100 text-slate-850 px-2 py-0.5 rounded font-bold text-[10px]">
-                            {item.role}
+                            {item.role === "KASUBAG" ? "KASUBAG / KEPALA KAS" : item.role}
                           </span>
                         </td>
                         <td className="p-3 font-medium text-slate-500">{getOfficeName(item.officeId)}</td>

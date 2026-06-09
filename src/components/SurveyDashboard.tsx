@@ -7,7 +7,8 @@ import React, { useState } from "react";
 import { CreditSurvey, UserSession, Office, AIAnalysis } from "../types";
 import {
   FileText, CheckCircle2, AlertTriangle, ShieldCheck, MapPin, Search, Sparkles, Plus,
-  DollarSign, BarChart2, Calendar, FileSpreadsheet, RefreshCw, XCircle, ArrowRight, Layers
+  DollarSign, BarChart2, Calendar, FileSpreadsheet, RefreshCw, XCircle, ArrowRight, Layers,
+  Printer
 } from "lucide-react";
 
 interface SurveyDashboardProps {
@@ -274,7 +275,7 @@ export default function SurveyDashboard({
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
       
       {/* LEFT COLUMN: SURVEY QUEUE & FILTERS [W-80 Equivalent or xl:4 span] */}
-      <div className="xl:col-span-4 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col h-[700px]">
+      <div className="xl:col-span-4 print:hidden bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col h-[700px]">
         <div className="p-4 bg-slate-50 border-b border-slate-200">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">
@@ -443,13 +444,13 @@ export default function SurveyDashboard({
       </div>
 
       {/* RIGHT COLUMN: DETAIL WORKFLOW BOARD & ANALYSES */}
-      <div className="xl:col-span-8 space-y-6">
+      <div className="xl:col-span-8 print:col-span-12 print:w-full space-y-6">
         {selectedSurvey ? (
-          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col min-h-[700px]">
+          <div id="survey-printcard" className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col min-h-[700px] print:border-none print:shadow-none">
             
             {/* Survey Header Area */}
-            <div className="p-6 border-b border-slate-200 bg-slate-50 relative print:hidden">
-              <span className="text-[9px] bg-slate-250 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mb-2 inline-block">
+            <div className="p-6 border-b border-slate-200 bg-slate-50 relative print:bg-white print:border-b-2 print:border-black">
+              <span className="text-[9px] bg-slate-250 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mb-2 inline-block print:text-black print:bg-white print:border print:border-slate-350">
                 Wilayah {getOfficeRegion(selectedSurvey.officeId)} • {getOfficeName(selectedSurvey.officeId)}
               </span>
               
@@ -459,7 +460,7 @@ export default function SurveyDashboard({
                     <img 
                       src={selectedSurvey.photoDebitur || TEMPLATE_PHOTOS.debitur} 
                       alt="Debitur Avatar" 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       referrerPolicy="no-referrer"
                     />
                   </div>
@@ -476,6 +477,15 @@ export default function SurveyDashboard({
                 </div>
 
                 <div className="flex flex-wrap gap-3.5 items-center self-start md:self-auto uppercase tracking-wide">
+                  {/* Cetak Laporan Button */}
+                  <button
+                    onClick={() => window.print()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-xs hover:shadow-sm transition cursor-pointer print:hidden"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span className="font-sans normal-case tracking-normal">Cetak Laporan</span>
+                  </button>
+
                   <div className="text-center bg-white p-1 rounded-lg border border-slate-150 shadow-xs">
                     <span className="block text-[7px] font-bold text-slate-400 mb-0.5">Berkas KTP</span>
                     <a 
@@ -487,7 +497,7 @@ export default function SurveyDashboard({
                       <img 
                         src={selectedSurvey.photoKtp || TEMPLATE_PHOTOS.ktp} 
                         alt="KTP" 
-                        className="w-14 h-8 object-cover rounded border border-slate-100 active:scale-95 transition"
+                        className="w-14 h-8 object-contain bg-slate-950/5 rounded border border-slate-100 active:scale-95 transition"
                         referrerPolicy="no-referrer"
                       />
                     </a>
@@ -504,7 +514,7 @@ export default function SurveyDashboard({
                       <img 
                         src={selectedSurvey.photoDebitur || TEMPLATE_PHOTOS.debitur} 
                         alt="Debitur Face" 
-                        className="w-14 h-8 object-cover rounded border border-slate-100 active:scale-95 transition"
+                        className="w-14 h-8 object-contain bg-slate-950/5 rounded border border-slate-100 active:scale-95 transition"
                         referrerPolicy="no-referrer"
                       />
                     </a>
@@ -671,21 +681,54 @@ export default function SurveyDashboard({
                     <div>
                       <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Rasio Agunan (LTV Ratio)</span>
                       {(() => {
-                        const totalColVal = selectedSurvey.collaterals && selectedSurvey.collaterals.length > 0
+                        const getTaksasi = (c: any) => {
+                          if (c.taksasiValue) return c.taksasiValue;
+                          if (c.type === "SHM") return Math.round((c.value || 0) * 1.5);
+                          if (c.type === "BPKB") {
+                            const age = c.vehicleAge ?? 1;
+                            return age <= 1 ? Math.round((c.value || 0) * 0.7) : Math.round((c.value || 0) * 0.6);
+                          }
+                          return c.value || 0;
+                        };
+
+                        const getTaksasiLabelText = (c: any) => {
+                          if (c.type === "SHM") return "Taksasi SHM (150%)";
+                          if (c.type === "BPKB") {
+                            const age = c.vehicleAge ?? 1;
+                            return `Taksasi BPKB th-${age} (${age <= 1 ? "70%" : "60%"})`;
+                          }
+                          return "Taksasi Umum (100%)";
+                        };
+
+                        const totalMarketVal = selectedSurvey.collaterals && selectedSurvey.collaterals.length > 0
                           ? selectedSurvey.collaterals.reduce((sum, c) => sum + (c.value || 0), 0)
                           : (selectedSurvey.collateralValue || 0);
+
+                        const totalTaksasiVal = selectedSurvey.collaterals && selectedSurvey.collaterals.length > 0
+                          ? selectedSurvey.collaterals.reduce((sum, c) => sum + getTaksasi(c), 0)
+                          : (selectedSurvey.collateralType === "SHM" ? Math.round((selectedSurvey.collateralValue || 0) * 1.5) : selectedSurvey.collateralType === "BPKB" ? Math.round((selectedSurvey.collateralValue || 0) * 0.7) : (selectedSurvey.collateralValue || 0));
+
                         return (
                           <>
-                            <div className="text-xs font-bold text-slate-800">
-                              Total Taksiran: Rp {totalColVal.toLocaleString("id-ID")}
+                            <div className="text-xs font-bold text-slate-850">
+                              Total Pasar: Rp {totalMarketVal.toLocaleString("id-ID")}
                             </div>
-                            <div className="text-[9px] text-slate-500 mt-1.5 max-h-24 overflow-y-auto space-y-1 bg-white p-1.5 rounded border border-slate-100">
+                            <div className="text-xs font-bold text-indigo-700 mt-1">
+                              Total Taksasi BPR: Rp {totalTaksasiVal.toLocaleString("id-ID")}
+                            </div>
+                            <div className="text-[9px] text-slate-500 mt-1.5 max-h-32 overflow-y-auto space-y-1 bg-white p-1.5 rounded border border-slate-100">
                               {selectedSurvey.collaterals && selectedSurvey.collaterals.length > 0 ? (
                                 selectedSurvey.collaterals.map((c, i) => (
                                   <div key={c.id || i} className="border-b border-slate-100 pb-1 last:border-b-0 last:pb-0">
-                                    <div className="font-bold text-indigo-700">{c.type === "SK_ASLI" ? "SK Asli Kerja" : c.type}</div>
-                                    <div className="text-slate-600 truncate leading-tight">{c.description || "-"}</div>
-                                    <div className="font-semibold text-emerald-700">Rp {(c.value || 0).toLocaleString("id-ID")}</div>
+                                    <div className="font-bold text-indigo-700 flex justify-between items-center">
+                                      <span>{c.type === "SK_ASLI" ? "SK Asli Kerja" : c.type}</span>
+                                      <span className="text-[8px] bg-slate-100 px-1 rounded text-slate-500">{getTaksasiLabelText(c)}</span>
+                                    </div>
+                                    <div className="text-slate-600 truncate leading-tight text-[8px]">{c.description || "-"}</div>
+                                    <div className="flex justify-between items-center mt-0.5 text-[9px]">
+                                      <span className="text-slate-400">Pasar: Rp {(c.value || 0).toLocaleString("id-ID")}</span>
+                                      <span className="font-bold text-emerald-700">Taksasi: Rp {getTaksasi(c).toLocaleString("id-ID")}</span>
+                                    </div>
                                   </div>
                                 ))
                               ) : (
@@ -696,16 +739,16 @@ export default function SurveyDashboard({
                               )}
                             </div>
 
-                            {totalColVal > 0 ? (
+                            {totalTaksasiVal > 0 ? (
                               <div className="mt-2.5">
                                 <div className="flex justify-between text-[10px] font-bold text-indigo-850">
-                                  <span>Loan-to-Value (LTV):</span>
-                                  <span>{((selectedSurvey.requestedAmount / totalColVal) * 100).toFixed(1)}%</span>
+                                  <span>LTV (terhadap Taksasi BPR):</span>
+                                  <span>{((selectedSurvey.requestedAmount / totalTaksasiVal) * 100).toFixed(1)}%</span>
                                 </div>
                                 <div className="w-full bg-slate-200 h-1.5 rounded-full mt-1 overflow-hidden">
                                   <div 
-                                    className={`h-full ${((selectedSurvey.requestedAmount / totalColVal) * 100) > 80 ? "bg-rose-500" : "bg-emerald-600"}`}
-                                    style={{ width: `${Math.min(100, (selectedSurvey.requestedAmount / totalColVal) * 100)}%` }}
+                                    className={`h-full ${((selectedSurvey.requestedAmount / totalTaksasiVal) * 100) > 80 ? "bg-rose-500" : "bg-emerald-600"}`}
+                                    style={{ width: `${Math.min(100, (selectedSurvey.requestedAmount / totalTaksasiVal) * 100)}%` }}
                                   />
                                 </div>
                               </div>
@@ -866,7 +909,7 @@ export default function SurveyDashboard({
                                   <img
                                     src={src}
                                     alt={`${category.label} ${idx + 1}`}
-                                    className="w-full h-14 sm:h-16 object-cover rounded border border-slate-100"
+                                    className="w-full h-14 sm:h-16 object-contain bg-slate-950/5 rounded border border-slate-100"
                                     referrerPolicy="no-referrer"
                                   />
                                   <span className="absolute top-0.5 left-0.5 bg-black/60 text-white text-[6px] font-bold px-1 rounded">
@@ -905,7 +948,7 @@ export default function SurveyDashboard({
                   <button
                     onClick={() => handleTriggerAIAnalysis(selectedSurvey.id)}
                     disabled={aiLoading}
-                    className="px-3.5 py-1 text-xs bg-indigo-550 border border-indigo-500 text-indigo-100 hover:bg-indigo-500 hover:text-white rounded-lg transition font-mono font-bold flex items-center gap-1.5 shrink-0"
+                    className="px-3.5 py-1 text-xs bg-indigo-550 border border-indigo-500 text-indigo-100 hover:bg-indigo-500 hover:text-white rounded-lg transition font-mono font-bold flex items-center gap-1.5 shrink-0 print:hidden"
                   >
                     <RefreshCw className={`w-3 h-3 ${aiLoading ? "animate-spin" : ""}`} />
                     {aiLoading ? "Menganalisa..." : selectedSurvey.aiAnalysis ? "Mutakhirkan AI" : "Ekstrak Rekomendasi AI"}
@@ -987,7 +1030,7 @@ export default function SurveyDashboard({
 
                 {/* TIER 1 ACTION: KASUBAG (Supervisor) */}
                 {currentSession.role === "KASUBAG" && selectedSurvey.status === "SUBMITTED_MO" && (
-                  <form onSubmit={handleKasubagAction} className="bg-slate-50 border border-slate-150 p-4 rounded-xl space-y-4">
+                  <form onSubmit={handleKasubagAction} className="bg-slate-50 border border-slate-150 p-4 rounded-xl space-y-4 print:hidden">
                     <h4 className="font-bold text-xs uppercase text-slate-505 block tracking-wider">
                       Ulasan & Rekomendasi Kasubag / Kepala Kas ({getOfficeRegion(currentSession.officeId)})
                     </h4>
@@ -1005,7 +1048,7 @@ export default function SurveyDashboard({
                       </div>
 
                       <div>
-                        <label className="block text-[10px] font-bold text-slate-505 uppercase tracking-wider mb-1">Catatan Supervisor Kasubag</label>
+                        <label className="block text-[10px] font-bold text-slate-505 uppercase tracking-wider mb-1">Catatan Supervisor (Kasubag / Kepala Kas)</label>
                         <input
                           type="text"
                           required
@@ -1027,9 +1070,9 @@ export default function SurveyDashboard({
                   </form>
                 )}
 
-                {/* TIER 2 ACTION: KABAG (Pimpinan / Pemutus) */}
-                {currentSession.role === "KABAG" && selectedSurvey.status === "REVIEWED_KASUBAG" && (
-                  <div className="bg-slate-50 border border-slate-150 p-4 rounded-xl space-y-4">
+                {/* TIER 2 ACTION: KABAG / PIMCAB (Pimpinan / Pemutus) */}
+                {(currentSession.role === "KABAG" || currentSession.role === "PIMCAB") && selectedSurvey.status === "REVIEWED_KASUBAG" && (
+                  <div className="bg-slate-50 border border-slate-150 p-4 rounded-xl space-y-4 print:hidden">
                     <h4 className="font-bold text-xs uppercase text-slate-505 block tracking-wider">
                       Formulir Keputusan Komite Final (KABAG / Pemimpin Cabang)
                     </h4>
@@ -1104,7 +1147,7 @@ export default function SurveyDashboard({
 
                     <div className="py-2 flex justify-between gap-4">
                       <div>
-                        <strong className="text-slate-700">Tahap 2: Re-Verifikasi Kompetensi Supervisor (KASUBAG)</strong>
+                        <strong className="text-slate-700">Tahap 2: Re-Verifikasi Supervisor Kredit (Kasubag / Kepala Kas)</strong>
                         <p className="text-slate-450 text-[11px]">
                           {selectedSurvey.kasubagNotes ? `Notes: "${selectedSurvey.kasubagNotes}"` : "Sedang diproses oleh Supervisor"}
                         </p>
